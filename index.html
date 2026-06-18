@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simulador Mundial 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .btn-active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: bold; }
+        /* Ocultar flechas de los inputs numéricos */
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased pb-20">
+
+    <!-- Header fijo -->
+    <header class="bg-blue-900 text-white p-4 shadow-md sticky top-0 z-50">
+        <h1 class="text-lg font-bold text-center">Simulador Mundial 2026</h1>
+    </header>
+
+    <!-- Navegación de pestañas (Scrollable para celular) -->
+    <nav class="bg-white shadow sticky top-[60px] z-40 overflow-x-auto whitespace-nowrap flex scrollbar-hide">
+        <button onclick="cambiarTab('fixture')" id="tab-fixture" class="p-3 text-sm btn-active">Fixture</button>
+        <button onclick="cambiarTab('grupos')" id="tab-grupos" class="p-3 text-sm text-gray-500">Grupos</button>
+        <button onclick="cambiarTab('terceros')" id="tab-terceros" class="p-3 text-sm text-gray-500">Terceros</button>
+        <button onclick="cambiarTab('cruces')" id="tab-cruces" class="p-3 text-sm text-gray-500">Cruces (16avos)</button>
+        <button onclick="cambiarTab('general')" id="tab-general" class="p-3 text-sm text-gray-500">General</button>
+    </nav>
+
+    <!-- Contenedor principal -->
+    <main class="p-2 max-w-md mx-auto mt-2">
+
+        <!-- Pestaña: Fixture (Carga de resultados) -->
+        <section id="content-fixture" class="tab-content active bg-white rounded shadow p-2">
+            <h2 class="font-bold text-gray-700 mb-2 border-b pb-1">Cargar Resultados</h2>
+            <p class="text-xs text-gray-500 mb-3">Modifica los goles y simula las posiciones. Todo se actualiza automáticamente.</p>
+            <div id="contenedor-fixture" class="space-y-3">
+                <!-- Se llena por JS -->
+            </div>
+        </section>
+
+        <!-- Pestaña: Grupos -->
+        <section id="content-grupos" class="tab-content">
+            <h2 class="font-bold text-gray-700 mb-2 pl-1">Posiciones por Grupo</h2>
+            <div id="contenedor-grupos" class="space-y-4"></div>
+        </section>
+
+        <!-- Pestaña: Terceros -->
+        <section id="content-terceros" class="tab-content bg-white rounded shadow p-2">
+            <h2 class="font-bold text-gray-700 mb-1 border-b pb-1">Tabla de Terceros</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-600">
+                        <tr><th class="p-1">Pos</th><th class="p-1">Equipo</th><th class="p-1 text-center">PTS</th><th class="p-1 text-center">DG</th></tr>
+                    </thead>
+                    <tbody id="tabla-terceros-body" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Pestaña: Cruces 16avos -->
+        <section id="content-cruces" class="tab-content bg-white rounded shadow p-2">
+            <h2 class="font-bold text-gray-700 mb-2 border-b pb-1">Cruces de 16avos de Final</h2>
+            <div id="contenedor-cruces" class="space-y-2">
+                <!-- Se llena por JS -->
+            </div>
+        </section>
+
+        <!-- Pestaña: General -->
+        <section id="content-general" class="tab-content bg-white rounded shadow p-2">
+            <h2 class="font-bold text-gray-700 mb-2 border-b pb-1">Tabla General</h2>
+            <table class="w-full text-sm text-left">
+                <thead class="bg-gray-50 text-gray-600">
+                    <tr><th class="p-1">Pos</th><th class="p-1">Equipo</th><th class="p-1 text-center">PTS</th><th class="p-1 text-center">DG</th></tr>
+                </thead>
+                <tbody id="tabla-general-body" class="divide-y divide-gray-200"></tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <script>
+        // --- 1. BASE DE DATOS LOCAL (Equipos y Partidos) ---
+        // Aquí agregué una muestra representativa (4 grupos completos para simular). 
+        // Podés agregar los grupos de la E a la L siguiendo esta misma estructura.
+        let equipos = [
+            { id: 'MEX', nombre: 'México', grupo: 'A' }, { id: 'KOR', nombre: 'Corea del Sur', grupo: 'A' }, { id: 'CZE', nombre: 'Rep. Checa', grupo: 'A' }, { id: 'RSA', nombre: 'Sudáfrica', grupo: 'A' },
+            { id: 'SUI', nombre: 'Suiza', grupo: 'B' }, { id: 'CAN', nombre: 'Canadá', grupo: 'B' }, { id: 'QAT', nombre: 'Qatar', grupo: 'B' }, { id: 'BIH', nombre: 'Bosnia', grupo: 'B' },
+            { id: 'SCO', nombre: 'Escocia', grupo: 'C' }, { id: 'MAR', nombre: 'Marruecos', grupo: 'C' }, { id: 'BRA', nombre: 'Brasil', grupo: 'C' }, { id: 'HAI', nombre: 'Haití', grupo: 'C' },
+            { id: 'USA', nombre: 'EE. UU.', grupo: 'D' }, { id: 'AUS', nombre: 'Australia', grupo: 'D' }, { id: 'TUR', nombre: 'Turquía', grupo: 'D' }, { id: 'PAR', nombre: 'Paraguay', grupo: 'D' }
+        ];
+
+        let fixture = [
+            { id: 1, grp: 'A', t1: 'MEX', t2: 'RSA', g1: 2, g2: 0 },
+            { id: 2, grp: 'A', t1: 'KOR', t2: 'CZE', g1: 1, g2: 0 },
+            { id: 3, grp: 'B', t1: 'SUI', t2: 'BIH', g1: 1, g2: 1 },
+            { id: 4, grp: 'B', t1: 'CAN', t2: 'QAT', g1: 0, g2: 0 },
+            { id: 5, grp: 'C', t1: 'SCO', t2: 'HAI', g1: 1, g2: 0 },
+            { id: 6, grp: 'C', t1: 'BRA', t2: 'MAR', g1: 0, g2: 0 },
+            { id: 7, grp: 'D', t1: 'USA', t2: 'PAR', g1: 3, g2: 0 },
+            { id: 8, grp: 'D', t1: 'AUS', t2: 'TUR', g1: 2, g2: 0 },
+            // Partidos en blanco para simular la fecha 2
+            { id: 9, grp: 'A', t1: 'MEX', t2: 'CZE', g1: null, g2: null },
+            { id: 10, grp: 'D', t1: 'PAR', t2: 'TUR', g1: null, g2: null }
+        ];
+
+        let estadoTorneo = []; // Aquí se guarda la tabla de posiciones dinámica
+
+        // --- 2. LÓGICA DE SIMULACIÓN Y CÁLCULO ---
+        function calcularPosiciones() {
+            // Reiniciar estadísticas de todos los equipos
+            estadoTorneo = equipos.map(eq => ({
+                ...eq, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0, posGrupo: 0
+            }));
+
+            // Procesar cada partido jugado
+            fixture.forEach(partido => {
+                if(partido.g1 !== null && partido.g2 !== null) {
+                    let eq1 = estadoTorneo.find(e => e.id === partido.t1);
+                    let eq2 = estadoTorneo.find(e => e.id === partido.t2);
+                    
+                    let g1 = parseInt(partido.g1);
+                    let g2 = parseInt(partido.g2);
+
+                    eq1.pj++; eq2.pj++;
+                    eq1.gf += g1; eq2.gf += g2;
+                    eq1.gc += g2; eq2.gc += g1;
+                    eq1.dg = eq1.gf - eq1.gc;
+                    eq2.dg = eq2.gf - eq2.gc;
+
+                    if(g1 > g2) { eq1.pts += 3; }
+                    else if(g1 < g2) { eq2.pts += 3; }
+                    else { eq1.pts += 1; eq2.pts += 1; }
+                }
+            });
+
+            // Ordenar dentro de cada grupo y asignar posición
+            const grupos = [...new Set(estadoTorneo.map(e => e.grupo))];
+            grupos.forEach(letra => {
+                let eqGrupo = estadoTorneo.filter(e => e.grupo === letra);
+                eqGrupo.sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
+                eqGrupo.forEach((eq, index) => {
+                    let ref = estadoTorneo.find(e => e.id === eq.id);
+                    ref.posGrupo = index + 1;
+                });
+            });
+
+            renderizarTodo();
+        }
+
+        // Actualizar gol desde el input
+        function actualizarGol(partidoId, equipoNum, valor) {
+            let partido = fixture.find(p => p.id === partidoId);
+            let goles = valor === "" ? null : parseInt(valor);
+            if(equipoNum === 1) partido.g1 = goles;
+            else partido.g2 = goles;
+            
+            calcularPosiciones(); // Recalcula mágicamente todo
+        }
+
+        // --- 3. FUNCIONES DE RENDERIZADO ---
+        function renderizarTodo() {
+            renderFixture();
+            renderGrupos();
+            renderTerceros();
+            renderGeneral();
+            renderCruces();
+        }
+
+        function renderFixture() {
+            const cont = document.getElementById('contenedor-fixture');
+            cont.innerHTML = '';
+            
+            fixture.forEach(p => {
+                let n1 = equipos.find(e => e.id === p.t1).nombre;
+                let n2 = equipos.find(e => e.id === p.t2).nombre;
+                let v1 = p.g1 !== null ? p.g1 : '';
+                let v2 = p.g2 !== null ? p.g2 : '';
+
+                cont.innerHTML += `
+                    <div class="bg-gray-50 p-2 rounded border border-gray-200 flex justify-between items-center shadow-sm">
+                        <div class="text-right flex-1 text-sm font-medium mr-2 truncate">${n1} <span class="text-[10px] text-gray-400">(${p.grp})</span></div>
+                        <div class="flex gap-1 items-center font-bold">
+                            <input type="number" min="0" max="20" value="${v1}" oninput="actualizarGol(${p.id}, 1, this.value)" class="w-10 h-8 text-center border border-gray-300 rounded focus:border-blue-500 outline-none text-lg">
+                            <span class="text-gray-400">-</span>
+                            <input type="number" min="0" max="20" value="${v2}" oninput="actualizarGol(${p.id}, 2, this.value)" class="w-10 h-8 text-center border border-gray-300 rounded focus:border-blue-500 outline-none text-lg">
+                        </div>
+                        <div class="text-left flex-1 text-sm font-medium ml-2 truncate">${n2}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderGrupos() {
+            const cont = document.getElementById('contenedor-grupos');
+            cont.innerHTML = '';
+            const grupos = [...new Set(estadoTorneo.map(e => e.grupo))].sort();
+
+            grupos.forEach(letra => {
+                let eqGrupo = estadoTorneo.filter(e => e.grupo === letra).sort((a, b) => a.posGrupo - b.posGrupo);
+                let tablaHTML = `
+                <div class="bg-white rounded shadow p-2 mb-3">
+                    <h3 class="font-bold text-blue-800 border-b pb-1 mb-1">Grupo ${letra}</h3>
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-gray-500 text-[11px]"><tr><th>Eq</th><th class="text-center">PJ</th><th class="text-center">PTS</th><th class="text-center">DG</th></tr></thead>
+                        <tbody>`;
+                
+                eqGrupo.forEach(eq => {
+                    let bColor = eq.posGrupo <= 2 ? 'border-green-500' : (eq.posGrupo === 3 ? 'border-orange-400' : 'border-red-500 text-gray-500');
+                    tablaHTML += `<tr class="border-t border-gray-100">
+                        <td class="p-1 border-l-2 ${bColor} font-medium pl-1">${eq.posGrupo}. ${eq.nombre}</td>
+                        <td class="p-1 text-center">${eq.pj}</td>
+                        <td class="p-1 text-center font-bold">${eq.pts}</td>
+                        <td class="p-1 text-center">${eq.dg}</td>
+                    </tr>`;
+                });
+                cont.innerHTML += tablaHTML + `</tbody></table></div>`;
+            });
+        }
+
+        function renderTerceros() {
+            const tbody = document.getElementById('tabla-terceros-body');
+            tbody.innerHTML = '';
+            let terceros = estadoTorneo.filter(e => e.posGrupo === 3).sort((a, b) => b.pts - a.pts || b.dg - a.dg);
+
+            terceros.forEach((eq, idx) => {
+                let clasifica = idx < 8; 
+                let rowClass = clasifica ? 'bg-orange-50 border-l-4 border-orange-400' : 'bg-red-50 border-l-4 border-red-500 text-gray-400';
+                tbody.innerHTML += `<tr class="${rowClass} border-b border-white">
+                    <td class="p-1 pl-2 font-bold">${idx + 1}</td>
+                    <td class="p-1 font-medium">${eq.nombre} <span class="text-xs opacity-75">(${eq.grupo})</span></td>
+                    <td class="p-1 text-center font-bold">${eq.pts}</td>
+                    <td class="p-1 text-center">${eq.dg}</td>
+                </tr>`;
+            });
+        }
+
+        function renderGeneral() {
+            const tbody = document.getElementById('tabla-general-body');
+            tbody.innerHTML = '';
+            let ordenados = [...estadoTorneo].sort((a, b) => b.pts - a.pts || b.dg - a.dg);
+            ordenados.forEach((eq, idx) => {
+                tbody.innerHTML += `<tr class="hover:bg-gray-50 border-b border-gray-100">
+                    <td class="p-1 text-gray-500">${idx + 1}</td>
+                    <td class="p-1 font-medium">${eq.nombre} <span class="text-[10px] text-gray-400">(${eq.grupo})</span></td>
+                    <td class="p-1 text-center font-bold">${eq.pts}</td><td class="p-1 text-center">${eq.dg}</td>
+                </tr>`;
+            });
+        }
+
+        function renderCruces() {
+            const cont = document.getElementById('contenedor-cruces');
+            cont.innerHTML = '';
+            
+            // Lógica simplificada de cruces
+            const getEq = (pos, grp) => estadoTorneo.find(e => e.posGrupo === pos && e.grupo === grp) || {nombre: 'Por definir'};
+            let terceros = estadoTorneo.filter(e => e.posGrupo === 3).sort((a, b) => b.pts - a.pts || b.dg - a.dg);
+            const get3ro = (idx) => terceros[idx] || {nombre: 'Por definir'};
+
+            // Estructura de cruces teóricos (16avos)
+            const llaves = [
+                { t1: getEq(1, 'A'), t2: get3ro(0), desc: '1A vs 1º Mejor Tercero' },
+                { t1: getEq(2, 'B'), t2: getEq(2, 'C'), desc: '2B vs 2C' },
+                { t1: getEq(1, 'C'), t2: get3ro(1), desc: '1C vs 2º Mejor Tercero' },
+                { t1: getEq(1, 'D'), t2: get3ro(2), desc: '1D vs 3º Mejor Tercero' }
+                // Agregás el resto a medida que sumás grupos
+            ];
+
+            llaves.forEach((llave, idx) => {
+                cont.innerHTML += `
+                    <div class="bg-blue-50 border border-blue-200 rounded p-2 mb-2">
+                        <div class="text-[10px] text-blue-500 font-bold uppercase mb-1">Partido ${idx + 1} - ${llave.desc}</div>
+                        <div class="flex justify-between items-center text-sm font-medium">
+                            <div class="flex-1 ${llave.t1.id ? 'text-gray-800' : 'text-gray-400 italic'}">${llave.t1.nombre}</div>
+                            <div class="px-2 text-gray-400 font-bold">vs</div>
+                            <div class="flex-1 text-right ${llave.t2.id ? 'text-gray-800' : 'text-gray-400 italic'}">${llave.t2.nombre}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- NAVEGACIÓN TABS ---
+        function cambiarTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(el => {
+                el.classList.remove('btn-active');
+                el.classList.add('text-gray-500');
+            });
+            document.getElementById(`content-${tabName}`).classList.add('active');
+            let btn = document.getElementById(`tab-${tabName}`);
+            btn.classList.add('btn-active');
+            btn.classList.remove('text-gray-500');
+        }
+
+        // Inicializar
+        window.onload = calcularPosiciones;
+
+    </script>
+</body>
+</html>
