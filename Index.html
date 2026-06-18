@@ -1,10 +1,3 @@
-Me parece una idea genial y muy divertida. Al sacar la dependencia de una actualización automática, transformamos la aplicación en un **Simulador del Mundial** en tiempo real. Vos vas a tener el control absoluto: cargás los goles, probás escenarios (por ejemplo, "qué pasa si Uruguay le gana 2-0 a su rival") y automáticamente vas a ver cómo se mueven las tablas y cómo se arman los cruces de 16avos de final.
-Para que funcione bien en el celular, agregué un menú deslizable con dos nuevas pestañas: **Fixture** (donde cargás los goles) y **Cruces** (donde se dibuja la fase eliminatoria). La lógica matemática para calcular los puntos, diferencias de gol y posiciones ahora se ejecuta en tu propio teléfono cada vez que modificás un número.
-### Consideraciones sobre los Cruces:
-Al clasificar los 8 mejores terceros de 12 grupos, la FIFA utiliza una matriz de combinaciones súper compleja para determinar exactamente contra qué primero de grupo va cada tercero. Para mantener el código ligero y funcional en el celular, armé un cuadro de 16avos de final con un formato lógico y estático (ej: El 1º del Grupo A va contra el 1º Mejor Tercero, etc.). ¡Es perfecto para simular!
-### Código de tu Simulador (simulador.html):
-Copiá este código, guardalo como .html y abrilo en el Chrome de tu Android como hicimos antes.
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -309,5 +302,3 @@ Copiá este código, guardalo como .html y abrilo en el Chrome de tu Android com
     </script>
 </body>
 </html>
-
-```
