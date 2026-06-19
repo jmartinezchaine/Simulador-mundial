@@ -1,80 +1,138 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Simulador Mundial 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .btn-active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: bold; }
-        /* Ocultar flechas de los inputs numéricos */
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .btn-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 </head>
+
 <body class="bg-gray-100 text-gray-800 antialiased pb-20">
 
-    <!-- Header fijo -->
-    <header class="bg-blue-900 text-white p-4 shadow-md sticky top-0 z-50">
-        <h1 class="text-lg font-bold text-center">Simulador Mundial 2026</h1>
+    <header class="bg-blue-900 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center">
+        <h1 class="text-base font-bold mx-auto">Simulador Mundial 2026</h1>
     </header>
 
-    <!-- Navegación de pestañas (Scrollable para celular) -->
-    <nav class="bg-white shadow sticky top-[60px] z-40 overflow-x-auto whitespace-nowrap flex scrollbar-hide">
+    <nav class="bg-white shadow sticky top-[55px] z-40 overflow-x-auto whitespace-nowrap flex scrollbar-hide">
         <button onclick="cambiarTab('fixture')" id="tab-fixture" class="p-3 text-sm btn-active">Fixture</button>
         <button onclick="cambiarTab('grupos')" id="tab-grupos" class="p-3 text-sm text-gray-500">Grupos</button>
         <button onclick="cambiarTab('terceros')" id="tab-terceros" class="p-3 text-sm text-gray-500">Terceros</button>
-        <button onclick="cambiarTab('cruces')" id="tab-cruces" class="p-3 text-sm text-gray-500">Cruces (16avos)</button>
+        <button onclick="cambiarTab('cruces')" id="tab-cruces" class="p-3 text-sm text-gray-500">Cruces
+            (16avos)</button>
         <button onclick="cambiarTab('general')" id="tab-general" class="p-3 text-sm text-gray-500">General</button>
     </nav>
 
-    <!-- Contenedor principal -->
     <main class="p-2 max-w-md mx-auto mt-2">
 
-        <!-- Pestaña: Fixture (Carga de resultados) -->
         <section id="content-fixture" class="tab-content active bg-white rounded shadow p-2">
-            <h2 class="font-bold text-gray-700 mb-2 border-b pb-1">Cargar Resultados</h2>
-            <p class="text-xs text-gray-500 mb-3">Modifica los goles y simula las posiciones. Todo se actualiza automáticamente.</p>
-            <div id="contenedor-fixture" class="space-y-3">
-                <!-- Se llena por JS -->
+            <div class="flex justify-between items-center border-b pb-2 mb-2">
+                <div>
+                    <h2 class="font-bold text-gray-700">Cargar Resultados</h2>
+                    <p class="text-[11px] text-gray-500">Define qué resultados son reales o simulados.</p>
+                </div>
+                <div class="flex flex-col gap-1 items-end">
+                    <div class="flex gap-1">
+                        <button onclick="irAPartidosDeHoy()"
+                            class="bg-blue-100 hover:bg-blue-200 text-blue-700 text-[11px] font-semibold px-2 py-1 rounded transition flex items-center gap-1">
+                            📅 Hoy
+                        </button>
+                        <button onclick="limpiarSimulaciones()"
+                            class="bg-orange-100 hover:bg-orange-200 text-orange-700 text-[11px] font-semibold px-2 py-1 rounded transition">
+                            Limpiar Sim.
+                        </button>
+                        <button onclick="reiniciarTodo()"
+                            class="bg-red-100 hover:bg-red-200 text-red-700 text-[11px] font-semibold px-2 py-1 rounded transition">
+                            Reset Total
+                        </button>
+                    </div>
+                    <div class="flex gap-1 mt-1">
+                        <button onclick="exportarDatos()"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-medium px-2 py-0.5 rounded transition flex items-center gap-1">
+                            📤 Exportar
+                        </button>
+                        <button onclick="document.getElementById('input-importar').click()"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-medium px-2 py-0.5 rounded transition flex items-center gap-1">
+                            📥 Importar
+                        </button>
+                        <input type="file" id="input-importar" accept=".json" onchange="importarDatos(event)"
+                            class="hidden">
+                    </div>
+                </div>
+            </div>
+            <div class="mb-2.5 relative">
+                <input type="text" id="filtro-equipo" oninput="renderFixture()"
+                    placeholder="🔍 Buscar partidos por equipo..."
+                    class="w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded-lg text-xs outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all bg-gray-50/50">
+            </div>
+            <div id="contenedor-fixture" class="space-y-4">
             </div>
         </section>
 
-        <!-- Pestaña: Grupos -->
         <section id="content-grupos" class="tab-content">
             <h2 class="font-bold text-gray-700 mb-2 pl-1">Posiciones por Grupo</h2>
             <div id="contenedor-grupos" class="space-y-4"></div>
         </section>
 
-        <!-- Pestaña: Terceros -->
         <section id="content-terceros" class="tab-content bg-white rounded shadow p-2">
             <h2 class="font-bold text-gray-700 mb-1 border-b pb-1">Tabla de Terceros</h2>
+            <p class="text-[11px] text-gray-500 mb-2">Clasifican los mejores 8 terceros a los 16avos de final.</p>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left">
                     <thead class="bg-gray-50 text-gray-600">
-                        <tr><th class="p-1">Pos</th><th class="p-1">Equipo</th><th class="p-1 text-center">PTS</th><th class="p-1 text-center">DG</th></tr>
+                        <tr>
+                            <th class="p-1">Pos</th>
+                            <th class="p-1">Equipo</th>
+                            <th class="p-1 text-center">PTS</th>
+                            <th class="p-1 text-center">DG</th>
+                        </tr>
                     </thead>
                     <tbody id="tabla-terceros-body" class="divide-y divide-gray-200"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- Pestaña: Cruces 16avos -->
         <section id="content-cruces" class="tab-content bg-white rounded shadow p-2">
-            <h2 class="font-bold text-gray-700 mb-2 border-b pb-1">Cruces de 16avos de Final</h2>
+            <h2 class="font-bold text-gray-700 mb-2 border-b pb-1">Fase Eliminatoria</h2>
+            <div class="flex gap-2 mb-3">
+                <button id="subtab-16avos" onclick="cambiarSubTab('16avos')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-all duration-200 bg-blue-900 text-white border-blue-900">16avos de Final</button>
+                <button id="subtab-8vos" onclick="cambiarSubTab('8vos')" class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-all duration-200 bg-white text-gray-700 border-gray-200">Octavos de Final (8vos)</button>
+            </div>
             <div id="contenedor-cruces" class="space-y-2">
-                <!-- Se llena por JS -->
             </div>
         </section>
 
-        <!-- Pestaña: General -->
         <section id="content-general" class="tab-content bg-white rounded shadow p-2">
             <h2 class="font-bold text-gray-700 mb-2 border-b pb-1">Tabla General</h2>
             <table class="w-full text-sm text-left">
                 <thead class="bg-gray-50 text-gray-600">
-                    <tr><th class="p-1">Pos</th><th class="p-1">Equipo</th><th class="p-1 text-center">PTS</th><th class="p-1 text-center">DG</th></tr>
+                    <tr>
+                        <th class="p-1">Pos</th>
+                        <th class="p-1">Equipo</th>
+                        <th class="p-1 text-center">PTS</th>
+                        <th class="p-1 text-center">DG</th>
+                    </tr>
                 </thead>
                 <tbody id="tabla-general-body" class="divide-y divide-gray-200"></tbody>
             </table>
@@ -83,61 +141,390 @@
     </main>
 
     <script>
-        // --- 1. BASE DE DATOS LOCAL (Equipos y Partidos) ---
-        // Aquí agregué una muestra representativa (4 grupos completos para simular). 
-        // Podés agregar los grupos de la E a la L siguiendo esta misma estructura.
-        let equipos = [
-            { id: 'MEX', nombre: 'México', grupo: 'A' }, { id: 'KOR', nombre: 'Corea del Sur', grupo: 'A' }, { id: 'CZE', nombre: 'Rep. Checa', grupo: 'A' }, { id: 'RSA', nombre: 'Sudáfrica', grupo: 'A' },
-            { id: 'SUI', nombre: 'Suiza', grupo: 'B' }, { id: 'CAN', nombre: 'Canadá', grupo: 'B' }, { id: 'QAT', nombre: 'Qatar', grupo: 'B' }, { id: 'BIH', nombre: 'Bosnia', grupo: 'B' },
-            { id: 'SCO', nombre: 'Escocia', grupo: 'C' }, { id: 'MAR', nombre: 'Marruecos', grupo: 'C' }, { id: 'BRA', nombre: 'Brasil', grupo: 'C' }, { id: 'HAI', nombre: 'Haití', grupo: 'C' },
-            { id: 'USA', nombre: 'EE. UU.', grupo: 'D' }, { id: 'AUS', nombre: 'Australia', grupo: 'D' }, { id: 'TUR', nombre: 'Turquía', grupo: 'D' }, { id: 'PAR', nombre: 'Paraguay', grupo: 'D' }
+        // --- 1. BASE DE DATOS LOCAL ESTÁTICA ---
+        const equiposBase = [
+            // Grupo A
+            { id: 'MEX', nombre: 'México', grupo: 'A' },
+            { id: 'RSA', nombre: 'Sudáfrica', grupo: 'A' },
+            { id: 'KOR', nombre: 'Corea del Sur', grupo: 'A' },
+            { id: 'CZE', nombre: 'Chequia', grupo: 'A' },
+            // Grupo B
+            { id: 'CAN', nombre: 'Canadá', grupo: 'B' },
+            { id: 'BIH', nombre: 'Bosnia y Hern.', grupo: 'B' },
+            { id: 'QAT', nombre: 'Qatar', grupo: 'B' },
+            { id: 'SUI', nombre: 'Suiza', grupo: 'B' },
+            // Grupo C
+            { id: 'BRA', nombre: 'Brasil', grupo: 'C' },
+            { id: 'MAR', nombre: 'Marruecos', grupo: 'C' },
+            { id: 'HAI', nombre: 'Haití', grupo: 'C' },
+            { id: 'SCO', nombre: 'Escocia', grupo: 'C' },
+            // Grupo D
+            { id: 'USA', nombre: 'Estados Unidos', grupo: 'D' },
+            { id: 'PAR', nombre: 'Paraguay', grupo: 'D' },
+            { id: 'AUS', nombre: 'Australia', grupo: 'D' },
+            { id: 'TUR', nombre: 'Turquía', grupo: 'D' },
+            // Grupo E
+            { id: 'GER', nombre: 'Alemania', grupo: 'E' },
+            { id: 'CUW', nombre: 'Curaçao', grupo: 'E' },
+            { id: 'CIV', nombre: 'Costa de Marfil', grupo: 'E' },
+            { id: 'ECU', nombre: 'Ecuador', grupo: 'E' },
+            // Grupo F
+            { id: 'NED', nombre: 'Países Bajos', grupo: 'F' },
+            { id: 'JPN', nombre: 'Japón', grupo: 'F' },
+            { id: 'SWE', nombre: 'Suecia', grupo: 'F' },
+            { id: 'TUN', nombre: 'Túnez', grupo: 'F' },
+            // Grupo G
+            { id: 'BEL', nombre: 'Bélgica', grupo: 'G' },
+            { id: 'EGY', nombre: 'Egipto', grupo: 'G' },
+            { id: 'IRN', nombre: 'Irán', grupo: 'G' },
+            { id: 'NZL', nombre: 'Nueva Zelanda', grupo: 'G' },
+            // Grupo H
+            { id: 'ESP', nombre: 'España', grupo: 'H' },
+            { id: 'CPV', nombre: 'Cabo Verde', grupo: 'H' },
+            { id: 'KSA', nombre: 'Arabia Saudita', grupo: 'H' },
+            { id: 'URU', nombre: 'Uruguay', grupo: 'H' },
+            // Grupo I
+            { id: 'FRA', nombre: 'Francia', grupo: 'I' },
+            { id: 'IRQ', nombre: 'Irak', grupo: 'I' },
+            { id: 'NOR', nombre: 'Noruega', grupo: 'I' },
+            { id: 'SEN', nombre: 'Senegal', grupo: 'I' },
+            // Grupo J
+            { id: 'ARG', nombre: 'Argentina', grupo: 'J' },
+            { id: 'ALG', nombre: 'Argelia', grupo: 'J' },
+            { id: 'AUT', nombre: 'Austria', grupo: 'J' },
+            { id: 'JOR', nombre: 'Jordania', grupo: 'J' },
+            // Grupo K
+            { id: 'POR', nombre: 'Portugal', grupo: 'K' },
+            { id: 'COD', nombre: 'RD Congo', grupo: 'K' },
+            { id: 'UZB', nombre: 'Uzbekistán', grupo: 'K' },
+            { id: 'COL', nombre: 'Colombia', grupo: 'K' },
+            // Grupo L
+            { id: 'ENG', nombre: 'Inglaterra', grupo: 'L' },
+            { id: 'CRO', nombre: 'Croacia', grupo: 'L' },
+            { id: 'GHA', nombre: 'Ghana', grupo: 'L' },
+            { id: 'PAN', nombre: 'Panamá', grupo: 'L' }
         ];
 
-        let fixture = [
-            { id: 1, grp: 'A', t1: 'MEX', t2: 'RSA', g1: 2, g2: 0 },
-            { id: 2, grp: 'A', t1: 'KOR', t2: 'CZE', g1: 1, g2: 0 },
-            { id: 3, grp: 'B', t1: 'SUI', t2: 'BIH', g1: 1, g2: 1 },
-            { id: 4, grp: 'B', t1: 'CAN', t2: 'QAT', g1: 0, g2: 0 },
-            { id: 5, grp: 'C', t1: 'SCO', t2: 'HAI', g1: 1, g2: 0 },
-            { id: 6, grp: 'C', t1: 'BRA', t2: 'MAR', g1: 0, g2: 0 },
-            { id: 7, grp: 'D', t1: 'USA', t2: 'PAR', g1: 3, g2: 0 },
-            { id: 8, grp: 'D', t1: 'AUS', t2: 'TUR', g1: 2, g2: 0 },
-            // Partidos en blanco para simular la fecha 2
-            { id: 9, grp: 'A', t1: 'MEX', t2: 'CZE', g1: null, g2: null },
-            { id: 10, grp: 'D', t1: 'PAR', t2: 'TUR', g1: null, g2: null }
+        const fixtureBase = [
+            // Grupo A
+            { id: 1, grp: 'A', t1: 'MEX', t2: 'RSA', g1: null, g2: null, fecha: '11 Jun', hora: '17:00', estadio: 'Estadio Azteca (CDMX)', esReal: false },
+            { id: 2, grp: 'A', t1: 'KOR', t2: 'CZE', g1: null, g2: null, fecha: '12 Jun', hora: '20:00', estadio: 'Estadio Akron (GDL)', esReal: false },
+            { id: 3, grp: 'A', t1: 'MEX', t2: 'KOR', g1: null, g2: null, fecha: '18 Jun', hora: '20:00', estadio: 'Estadio BBVA (MTY)', esReal: false },
+            { id: 4, grp: 'A', t1: 'CZE', t2: 'RSA', g1: null, g2: null, fecha: '18 Jun', hora: '12:00', estadio: 'Mercedes-Benz (ATL)', esReal: false },
+            { id: 5, grp: 'A', t1: 'CZE', t2: 'MEX', g1: null, g2: null, fecha: '24 Jun', hora: '17:00', estadio: 'Estadio Azteca (CDMX)', esReal: false },
+            { id: 6, grp: 'A', t1: 'RSA', t2: 'KOR', g1: null, g2: null, fecha: '24 Jun', hora: '17:00', estadio: 'Estadio BBVA (MTY)', esReal: false },
+
+            // Grupo B
+            { id: 7, grp: 'B', t1: 'CAN', t2: 'BIH', g1: null, g2: null, fecha: '12 Jun', hora: '16:00', estadio: 'BMO Field (Toronto)', esReal: false },
+            { id: 8, grp: 'B', t1: 'QAT', t2: 'SUI', g1: null, g2: null, fecha: '13 Jun', hora: '19:00', estadio: 'BC Place (Vancouver)', esReal: false },
+            { id: 9, grp: 'B', t1: 'CAN', t2: 'QAT', g1: null, g2: null, fecha: '18 Jun', hora: '15:00', estadio: 'BC Place (Vancouver)', esReal: false },
+            { id: 10, grp: 'B', t1: 'SUI', t2: 'BIH', g1: null, g2: null, fecha: '18 Jun', hora: '12:00', estadio: 'SoFi Stadium (LA)', esReal: false },
+            { id: 11, grp: 'B', t1: 'SUI', t2: 'CAN', g1: null, g2: null, fecha: '22 Jun', hora: '19:00', estadio: 'BMO Field (Toronto)', esReal: false },
+            { id: 12, grp: 'B', t1: 'BIH', t2: 'QAT', g1: null, g2: null, fecha: '22 Jun', hora: '19:00', estadio: 'BC Place (Vancouver)', esReal: false },
+
+            // Grupo C
+            { id: 13, grp: 'C', t1: 'BRA', t2: 'MAR', g1: null, g2: null, fecha: '14 Jun', hora: '18:00', estadio: 'SoFi Stadium (LA)', esReal: false },
+            { id: 14, grp: 'C', t1: 'HAI', t2: 'SCO', g1: null, g2: null, fecha: '14 Jun', hora: '21:00', estadio: 'Levi\'s Stadium (SF)', esReal: false },
+            { id: 15, grp: 'C', t1: 'BRA', t2: 'HAI', g1: null, g2: null, fecha: '19 Jun', hora: '17:30', estadio: 'SoFi Stadium (LA)', esReal: false },
+            { id: 16, grp: 'C', t1: 'SCO', t2: 'MAR', g1: null, g2: null, fecha: '19 Jun', hora: '15:00', estadio: 'Lumen Field (Seattle)', esReal: false },
+            { id: 17, grp: 'C', t1: 'SCO', t2: 'BRA', g1: null, g2: null, fecha: '25 Jun', hora: '21:00', estadio: 'Levi\'s Stadium (SF)', esReal: false },
+            { id: 18, grp: 'C', t1: 'MAR', t2: 'HAI', g1: null, g2: null, fecha: '25 Jun', hora: '21:00', estadio: 'SoFi Stadium (LA)', esReal: false },
+
+            // Grupo D
+            { id: 19, grp: 'D', t1: 'USA', t2: 'PAR', g1: null, g2: null, fecha: '12 Jun', hora: '15:00', estadio: 'SoFi Stadium (LA)', esReal: false },
+            { id: 20, grp: 'D', t1: 'AUS', t2: 'TUR', g1: null, g2: null, fecha: '13 Jun', hora: '18:00', estadio: 'BC Place (Vancouver)', esReal: false },
+            { id: 21, grp: 'D', t1: 'USA', t2: 'AUS', g1: null, g2: null, fecha: '19 Jun', hora: '12:00', estadio: 'Lumen Field (Seattle)', esReal: false },
+            { id: 22, grp: 'D', t1: 'TUR', t2: 'PAR', g1: null, g2: null, fecha: '19 Jun', hora: '21:00', estadio: 'Levi\'s Stadium (SF)', esReal: false },
+            { id: 23, grp: 'D', t1: 'TUR', t2: 'USA', g1: null, g2: null, fecha: '25 Jun', hora: '18:00', estadio: 'SoFi Stadium (LA)', esReal: false },
+            { id: 24, grp: 'D', t1: 'PAR', t2: 'AUS', g1: null, g2: null, fecha: '25 Jun', hora: '18:00', estadio: 'Levi\'s Stadium (SF)', esReal: false },
+
+            // Grupo E
+            { id: 25, grp: 'E', t1: 'GER', t2: 'CUW', g1: null, g2: null, fecha: '14 Jun', hora: '13:00', estadio: 'NRG Stadium (Houston)', esReal: false },
+            { id: 26, grp: 'E', t1: 'CIV', t2: 'ECU', g1: null, g2: null, fecha: '14 Jun', hora: '19:00', estadio: 'Lincoln Financial (PHI)', esReal: false },
+            { id: 27, grp: 'E', t1: 'GER', t2: 'CIV', g1: null, g2: null, fecha: '20 Jun', hora: '16:00', estadio: 'BMO Field (Toronto)', esReal: false },
+            { id: 28, grp: 'E', t1: 'ECU', t2: 'CUW', g1: null, g2: null, fecha: '20 Jun', hora: '20:00', estadio: 'Arrowhead (KC)', esReal: false },
+            { id: 29, grp: 'E', t1: 'ECU', t2: 'GER', g1: null, g2: null, fecha: '25 Jun', hora: '16:00', estadio: 'MetLife (New York)', esReal: false },
+            { id: 30, grp: 'E', t1: 'CUW', t2: 'CIV', g1: null, g2: null, fecha: '25 Jun', hora: '16:00', estadio: 'Lincoln Financial (PHI)', esReal: false },
+
+            // Grupo F
+            { id: 31, grp: 'F', t1: 'NED', t2: 'JPN', g1: null, g2: null, fecha: '14 Jun', hora: '14:00', estadio: 'AT&T Stadium (Dallas)', esReal: false },
+            { id: 32, grp: 'F', t1: 'SWE', t2: 'TUN', g1: null, g2: null, fecha: '14 Jun', hora: '17:00', estadio: 'Estadio BBVA (MTY)', esReal: false },
+            { id: 33, grp: 'F', t1: 'NED', t2: 'SWE', g1: null, g2: null, fecha: '20 Jun', hora: '14:00', estadio: 'NRG Stadium (Houston)', esReal: false },
+            { id: 34, grp: 'F', t1: 'TUN', t2: 'JPN', g1: null, g2: null, fecha: '21 Jun', hora: '20:00', estadio: 'Estadio BBVA (MTY)', esReal: false },
+            { id: 35, grp: 'F', t1: 'TUN', t2: 'NED', g1: null, g2: null, fecha: '25 Jun', hora: '17:00', estadio: 'Arrowhead (KC)', esReal: false },
+            { id: 36, grp: 'F', t1: 'JPN', t2: 'SWE', g1: null, g2: null, fecha: '25 Jun', hora: '17:00', estadio: 'AT&T Stadium (Dallas)', esReal: false },
+
+            // Grupo G
+            { id: 37, grp: 'G', t1: 'BEL', t2: 'EGY', g1: null, g2: null, fecha: '15 Jun', hora: '12:00', estadio: 'Lumen Field (Seattle)', esReal: false },
+            { id: 38, grp: 'G', t1: 'IRN', t2: 'NZL', g1: null, g2: null, fecha: '15 Jun', hora: '18:00', estadio: 'SoFi Stadium (LA)', esReal: false },
+            { id: 39, grp: 'G', t1: 'BEL', t2: 'IRN', g1: null, g2: null, fecha: '21 Jun', hora: '12:00', estadio: 'SoFi Stadium (LA)', esReal: false },
+            { id: 40, grp: 'G', t1: 'NZL', t2: 'EGY', g1: null, g2: null, fecha: '21 Jun', hora: '18:00', estadio: 'BC Place (Vancouver)', esReal: false },
+            { id: 41, grp: 'G', t1: 'NZL', t2: 'BEL', g1: null, g2: null, fecha: '26 Jun', hora: '18:00', estadio: 'SoFi Stadium (LA)', esReal: false },
+            { id: 42, grp: 'G', t1: 'EGY', t2: 'IRN', g1: null, g2: null, fecha: '26 Jun', hora: '20:00', estadio: 'Lumen Field (Seattle)', esReal: false },
+
+            // Grupo H
+            { id: 43, grp: 'H', t1: 'ESP', t2: 'CPV', g1: null, g2: null, fecha: '15 Jun', hora: '17:00', estadio: 'Mercedes-Benz (ATL)', esReal: false },
+            { id: 44, grp: 'H', t1: 'KSA', t2: 'URU', g1: null, g2: null, fecha: '15 Jun', hora: '20:00', estadio: 'Hard Rock (Miami)', esReal: false },
+            { id: 45, grp: 'H', t1: 'ESP', t2: 'KSA', g1: null, g2: null, fecha: '21 Jun', hora: '12:00', estadio: 'Mercedes-Benz (ATL)', esReal: false },
+            { id: 46, grp: 'H', t1: 'URU', t2: 'CPV', g1: null, g2: null, fecha: '21 Jun', hora: '18:00', estadio: 'Hard Rock (Miami)', esReal: false },
+            { id: 47, grp: 'H', t1: 'URU', t2: 'ESP', g1: null, g2: null, fecha: '26 Jun', hora: '18:00', estadio: 'Estadio Akron (GDL)', esReal: false },
+            { id: 48, grp: 'H', t1: 'CPV', t2: 'KSA', g1: null, g2: null, fecha: '26 Jun', hora: '19:00', estadio: 'NRG Stadium (Houston)', esReal: false },
+
+            // Grupo I
+            { id: 49, grp: 'I', t1: 'FRA', t2: 'SEN', g1: null, g2: null, fecha: '16 Jun', hora: '16:00', estadio: 'MetLife (New York)', esReal: false },
+            { id: 50, grp: 'I', t1: 'IRQ', t2: 'NOR', g1: null, g2: null, fecha: '16 Jun', hora: '19:00', estadio: 'Gillette Stadium (Boston)', esReal: false },
+            { id: 51, grp: 'I', t1: 'FRA', t2: 'IRQ', g1: null, g2: null, fecha: '22 Jun', hora: '16:00', estadio: 'Lincoln Financial (PHI)', esReal: false },
+            { id: 52, grp: 'I', t1: 'NOR', t2: 'SEN', g1: null, g2: null, fecha: '22 Jun', hora: '19:00', estadio: 'MetLife (New York)', esReal: false },
+            { id: 53, grp: 'I', t1: 'NOR', t2: 'FRA', g1: null, g2: null, fecha: '26 Jun', hora: '14:00', estadio: 'Gillette Stadium (Boston)', esReal: false },
+            { id: 54, grp: 'I', t1: 'SEN', t2: 'IRQ', g1: null, g2: null, fecha: '26 Jun', hora: '14:00', estadio: 'BMO Field (Toronto)', esReal: false },
+
+            // Grupo J
+            { id: 55, grp: 'J', t1: 'ARG', t2: 'ALG', g1: null, g2: null, fecha: '16 Jun', hora: '14:00', estadio: 'Arrowhead (KC)', esReal: false },
+            { id: 56, grp: 'J', t1: 'AUT', t2: 'JOR', g1: null, g2: null, fecha: '16 Jun', hora: '17:00', estadio: 'Levi\'s Stadium (SF)', esReal: false },
+            { id: 57, grp: 'J', t1: 'ARG', t2: 'AUT', g1: null, g2: null, fecha: '22 Jun', hora: '14:00', estadio: 'AT&T Stadium (Dallas)', esReal: false },
+            { id: 58, grp: 'J', t1: 'JOR', t2: 'ALG', g1: null, g2: null, fecha: '22 Jun', hora: '17:00', estadio: 'Levi\'s Stadium (SF)', esReal: false },
+            { id: 59, grp: 'J', t1: 'JOR', t2: 'ARG', g1: null, g2: null, fecha: '26 Jun', hora: '17:00', estadio: 'Mercedes-Benz (ATL)', esReal: false },
+            { id: 60, grp: 'J', t1: 'ALG', t2: 'AUT', g1: null, g2: null, fecha: '26 Jun', hora: '17:00', estadio: 'NRG Stadium (Houston)', esReal: false },
+
+            // Grupo K
+            { id: 61, grp: 'K', t1: 'POR', t2: 'COD', g1: null, g2: null, fecha: '17 Jun', hora: '18:00', estadio: 'NRG Stadium (Houston)', esReal: false },
+            { id: 62, grp: 'K', t1: 'UZB', t2: 'COL', g1: null, g2: null, fecha: '17 Jun', hora: '21:00', estadio: 'Estadio Azteca (CDMX)', esReal: false },
+            { id: 63, grp: 'K', t1: 'POR', t2: 'UZB', g1: null, g2: null, fecha: '23 Jun', hora: '12:00', estadio: 'NRG Stadium (Houston)', esReal: false },
+            { id: 64, grp: 'K', t1: 'COL', t2: 'COD', g1: null, g2: null, fecha: '23 Jun', hora: '20:00', estadio: 'Estadio Akron (GDL)', esReal: false },
+            { id: 65, grp: 'K', t1: 'COL', t2: 'POR', g1: null, g2: null, fecha: '27 Jun', hora: '21:00', estadio: 'Hard Rock (Miami)', esReal: false },
+            { id: 66, grp: 'K', t1: 'COD', t2: 'UZB', g1: null, g2: null, fecha: '27 Jun', hora: '21:00', estadio: 'Mercedes-Benz (ATL)', esReal: false },
+
+            // Grupo L
+            { id: 67, grp: 'L', t1: 'ENG', t2: 'CRO', g1: null, g2: null, fecha: '17 Jun', hora: '15:00', estadio: 'AT&T Stadium (Dallas)', esReal: false },
+            { id: 68, grp: 'L', t1: 'GHA', t2: 'PAN', g1: null, g2: null, fecha: '17 Jun', hora: '18:00', estadio: 'BMO Field (Toronto)', esReal: false },
+            { id: 69, grp: 'L', t1: 'ENG', t2: 'GHA', g1: null, g2: null, fecha: '23 Jun', hora: '15:00', estadio: 'Gillette Stadium (Boston)', esReal: false },
+            { id: 70, grp: 'L', t1: 'PAN', t2: 'CRO', g1: null, g2: null, fecha: '23 Jun', hora: '18:00', estadio: 'BMO Field (Toronto)', esReal: false },
+            { id: 71, grp: 'L', t1: 'PAN', t2: 'ENG', g1: null, g2: null, fecha: '27 Jun', hora: '15:00', estadio: 'MetLife (New York)', esReal: false },
+            { id: 72, grp: 'L', t1: 'CRO', t2: 'GHA', g1: null, g2: null, fecha: '27 Jun', hora: '15:00', estadio: 'Lincoln Financial (PHI)', esReal: false }
         ];
 
-        let estadoTorneo = []; // Aquí se guarda la tabla de posiciones dinámica
+        let equipos = [];
+        let fixture = [];
+        let estadoTorneo = [];
+        let ganadores16avos = {};
+        let ganadores8vos = {};
+        let subTabActivo = '16avos';
+
+        function cambiarSubTab(subTabName) {
+            subTabActivo = subTabName;
+            document.getElementById('subtab-16avos').className = subTabName === '16avos' 
+                ? 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-all duration-200 bg-blue-900 text-white border-blue-900'
+                : 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-all duration-200 bg-white text-gray-700 border-gray-200';
+            document.getElementById('subtab-8vos').className = subTabName === '8vos'
+                ? 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-all duration-200 bg-blue-900 text-white border-blue-900'
+                : 'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition-all duration-200 bg-white text-gray-700 border-gray-200';
+            renderCruces();
+        }
+
+        function elegirGanador16avo(idx, teamId) {
+            if (!teamId) return;
+            if (ganadores16avos[idx] === teamId) {
+                delete ganadores16avos[idx];
+            } else {
+                ganadores16avos[idx] = teamId;
+            }
+            const mapaLlaveA8vo = {
+                1: 0, 4: 0,
+                0: 1, 2: 1,
+                3: 2, 5: 2,
+                6: 3, 7: 3,
+                10: 4, 11: 4,
+                8: 5, 9: 5,
+                13: 6, 15: 6,
+                12: 7, 14: 7
+            };
+            const octavoAfectado = mapaLlaveA8vo[idx];
+            if (octavoAfectado !== undefined) {
+                delete ganadores8vos[octavoAfectado];
+            }
+            localStorage.setItem('simulador_2026_ganadores16avos', JSON.stringify(ganadores16avos));
+            localStorage.setItem('simulador_2026_ganadores8vos', JSON.stringify(ganadores8vos));
+            renderCruces();
+        }
+
+        function elegirGanador8vo(idx, teamId) {
+            if (!teamId) return;
+            if (ganadores8vos[idx] === teamId) {
+                delete ganadores8vos[idx];
+            } else {
+                ganadores8vos[idx] = teamId;
+            }
+            localStorage.setItem('simulador_2026_ganadores8vos', JSON.stringify(ganadores8vos));
+            renderCruces();
+        }
+
+        // Inicializar datos desde LocalStorage o usar la Base
+        function inicializarDatos() {
+            equipos = JSON.parse(JSON.stringify(equiposBase));
+            const guardado = localStorage.getItem('simulador_2026_fixture');
+            let usarBase = true;
+            let fixtureCargado = null;
+
+            try {
+                ganadores16avos = JSON.parse(localStorage.getItem('simulador_2026_ganadores16avos') || '{}');
+                ganadores8vos = JSON.parse(localStorage.getItem('simulador_2026_ganadores8vos') || '{}');
+            } catch (e) {
+                ganadores16avos = {};
+                ganadores8vos = {};
+            }
+
+            if (guardado) {
+                try {
+                    const parsed = JSON.parse(guardado);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        // Verificar que sea de la versión actual (al menos un equipo del guardado existe)
+                        const deVersionActual = parsed.some(p => equipos.some(e => e.id === p.t1));
+                        if (deVersionActual) {
+                            fixtureCargado = parsed;
+                            usarBase = false;
+                        }
+                    }
+                } catch (e) { }
+            }
+
+            if (usarBase) {
+                fixture = JSON.parse(JSON.stringify(fixtureBase));
+                localStorage.setItem('simulador_2026_fixture', JSON.stringify(fixture));
+            } else {
+                // Hacer un MERGE inteligente con la base oficial para no perder los datos del usuario
+                fixture = JSON.parse(JSON.stringify(fixtureBase));
+                fixture.forEach(partidoOficial => {
+                    const partidoGuardado = fixtureCargado.find(p => 
+                        (p.t1 === partidoOficial.t1 && p.t2 === partidoOficial.t2) ||
+                        (p.t1 === partidoOficial.t2 && p.t2 === partidoOficial.t1)
+                    );
+                    if (partidoGuardado) {
+                        if (partidoGuardado.t1 === partidoOficial.t1) {
+                            partidoOficial.g1 = partidoGuardado.g1;
+                            partidoOficial.g2 = partidoGuardado.g2;
+                        } else {
+                            partidoOficial.g1 = partidoGuardado.g2;
+                            partidoOficial.g2 = partidoGuardado.g1;
+                        }
+                        partidoOficial.esReal = partidoGuardado.esReal;
+                    }
+                });
+                // Guardar la versión reparada y fusionada
+                guardarDatos();
+            }
+            calcularPosiciones();
+        }
+
+        // Guardar estado actual
+        function guardarDatos() {
+            localStorage.setItem('simulador_2026_fixture', JSON.stringify(fixture));
+        }
+
+        // Limpiar solo lo que esté marcado como simulación
+        function limpiarSimulaciones() {
+            fixture.forEach(p => {
+                if (!p.esReal) {
+                    p.g1 = null;
+                    p.g2 = null;
+                }
+            });
+            ganadores16avos = {};
+            ganadores8vos = {};
+            localStorage.removeItem('simulador_2026_ganadores16avos');
+            localStorage.removeItem('simulador_2026_ganadores8vos');
+            guardarDatos();
+            calcularPosiciones();
+        }
+
+        // Reset completo de la App
+        function reiniciarTodo() {
+            if (confirm("¿Estás seguro de que quieres borrar absolutamente todos los datos cargados?")) {
+                localStorage.removeItem('simulador_2026_fixture');
+                localStorage.removeItem('simulador_2026_ganadores16avos');
+                localStorage.removeItem('simulador_2026_ganadores8vos');
+                inicializarDatos();
+            }
+        }
+
+        // Exportar datos a un archivo JSON
+        function exportarDatos() {
+            try {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fixture, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", "simulador_mundial_2026.json");
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                showToast("Datos exportados correctamente", "success");
+            } catch (error) {
+                showToast("Error al exportar los datos", "warning");
+            }
+        }
+
+        // Importar datos desde un archivo JSON
+        function importarDatos(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    // Validar si el archivo importado es completamente compatible con el fixture actual
+                    if (Array.isArray(parsed) && parsed.length === fixtureBase.length) {
+                        const todosExisten = parsed.every(p =>
+                            equipos.some(e => e.id === p.t1) &&
+                            equipos.some(e => e.id === p.t2)
+                        );
+                        if (todosExisten) {
+                            fixture = parsed;
+                            guardarDatos();
+                            calcularPosiciones();
+                            showToast("Datos importados con éxito", "success");
+                        } else {
+                            showToast("El archivo contiene selecciones incompatibles", "warning");
+                        }
+                    } else {
+                        showToast("Formato de archivo inválido", "warning");
+                    }
+                } catch (error) {
+                    showToast("Error al procesar el archivo JSON", "warning");
+                }
+                // Limpiar el valor del input para poder importar el mismo archivo de nuevo si se desea
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
 
         // --- 2. LÓGICA DE SIMULACIÓN Y CÁLCULO ---
         function calcularPosiciones() {
-            // Reiniciar estadísticas de todos los equipos
             estadoTorneo = equipos.map(eq => ({
                 ...eq, pts: 0, pj: 0, gf: 0, gc: 0, dg: 0, posGrupo: 0
             }));
 
-            // Procesar cada partido jugado
             fixture.forEach(partido => {
-                if(partido.g1 !== null && partido.g2 !== null) {
+                if (partido.g1 !== null && partido.g2 !== null) {
                     let eq1 = estadoTorneo.find(e => e.id === partido.t1);
                     let eq2 = estadoTorneo.find(e => e.id === partido.t2);
-                    
+
                     let g1 = parseInt(partido.g1);
                     let g2 = parseInt(partido.g2);
 
-                    eq1.pj++; eq2.pj++;
-                    eq1.gf += g1; eq2.gf += g2;
-                    eq1.gc += g2; eq2.gc += g1;
-                    eq1.dg = eq1.gf - eq1.gc;
-                    eq2.dg = eq2.gf - eq2.gc;
+                    if (eq1 && eq2) {
+                        eq1.pj++; eq2.pj++;
+                        eq1.gf += g1; eq2.gf += g2;
+                        eq1.gc += g2; eq2.gc += g1;
+                        eq1.dg = eq1.gf - eq1.gc;
+                        eq2.dg = eq2.gf - eq2.gc;
 
-                    if(g1 > g2) { eq1.pts += 3; }
-                    else if(g1 < g2) { eq2.pts += 3; }
-                    else { eq1.pts += 1; eq2.pts += 1; }
+                        if (g1 > g2) { eq1.pts += 3; }
+                        else if (g1 < g2) { eq2.pts += 3; }
+                        else { eq1.pts += 1; eq2.pts += 1; }
+                    }
                 }
             });
 
-            // Ordenar dentro de cada grupo y asignar posición
             const grupos = [...new Set(estadoTorneo.map(e => e.grupo))];
             grupos.forEach(letra => {
                 let eqGrupo = estadoTorneo.filter(e => e.grupo === letra);
@@ -151,14 +538,21 @@
             renderizarTodo();
         }
 
-        // Actualizar gol desde el input
         function actualizarGol(partidoId, equipoNum, valor) {
             let partido = fixture.find(p => p.id === partidoId);
             let goles = valor === "" ? null : parseInt(valor);
-            if(equipoNum === 1) partido.g1 = goles;
+            if (equipoNum === 1) partido.g1 = goles;
             else partido.g2 = goles;
-            
-            calcularPosiciones(); // Recalcula mágicamente todo
+
+            guardarDatos();
+            calcularPosiciones();
+        }
+
+        function alternarTipoResultado(partidoId) {
+            let partido = fixture.find(p => p.id === partidoId);
+            partido.esReal = !partido.esReal;
+            guardarDatos();
+            calcularPosiciones();
         }
 
         // --- 3. FUNCIONES DE RENDERIZADO ---
@@ -170,28 +564,150 @@
             renderCruces();
         }
 
+        function obtenerUYT(fechaOriginal, horaOriginal, estadio) {
+            const mesesCompletos = { "Ene": 0, "Feb": 1, "Mar": 2, "Abr": 3, "May": 4, "Jun": 5, "Jul": 6, "Ago": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dic": 11 };
+            const nombresMeses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+            
+            const [hora, min] = horaOriginal.split(':').map(Number);
+            const dia = parseInt(fechaOriginal.split(' ')[0]);
+            const mesStr = fechaOriginal.split(' ')[1];
+            const mes = mesesCompletos[mesStr];
+            
+            // Determinar offset del estadio en base a su nombre (en horario de verano / DST)
+            let offset = -4; // Default: EDT (Eastern Daylight Time, UTC-4)
+            if (estadio.includes("Azteca") || estadio.includes("Akron") || estadio.includes("BBVA") || estadio.includes("Houston") || estadio.includes("Arrowhead") || estadio.includes("Dallas")) {
+                offset = -5; // CDT (Central Daylight Time, UTC-5)
+            } else if (estadio.includes("Vancouver") || estadio.includes("SoFi") || estadio.includes("Levi's") || estadio.includes("Seattle")) {
+                offset = -7; // PDT (Pacific Daylight Time, UTC-7)
+            }
+            
+            // Diferencia para llegar a UYT (-3)
+            const diffHoras = -3 - offset;
+            
+            // Crear objeto Date en UTC (usando año 2026) y sumar diferencia de horas
+            const date = new Date(Date.UTC(2026, mes, dia, hora, min));
+            date.setUTCHours(date.getUTCHours() + diffHoras);
+            
+            const nuevoDia = date.getUTCDate();
+            const nuevoMes = nombresMeses[date.getUTCMonth()];
+            const nuevaHora = String(date.getUTCHours()).padStart(2, '0') + ':' + String(date.getUTCMinutes()).padStart(2, '0');
+            
+            return {
+                fecha: `${nuevoDia} ${nuevoMes}`,
+                hora: nuevaHora
+            };
+        }
+
         function renderFixture() {
+            // Guardar el ID del elemento con foco antes de vaciar el contenedor
+            const focusedId = document.activeElement ? document.activeElement.id : null;
+
             const cont = document.getElementById('contenedor-fixture');
             cont.innerHTML = '';
-            
-            fixture.forEach(p => {
-                let n1 = equipos.find(e => e.id === p.t1).nombre;
-                let n2 = equipos.find(e => e.id === p.t2).nombre;
+
+            const filtroEquipo = document.getElementById('filtro-equipo')?.value.toLowerCase() || '';
+
+            const mesesCompletos = { "Ene": 1, "Feb": 2, "Mar": 3, "Abr": 4, "May": 5, "Jun": 6, "Jul": 7, "Ago": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dic": 12 };
+
+            // Precalcular el horario UYT para cada partido para ordenar y renderizar correctamente
+            const fixtureConUYT = fixture.map(p => {
+                const uyt = obtenerUYT(p.fecha, p.hora, p.estadio);
+                return {
+                    ...p,
+                    fechaUyt: uyt.fecha,
+                    horaUyt: uyt.hora
+                };
+            });
+
+            const fixtureOrdenado = fixtureConUYT.sort((a, b) => {
+                const diaA = parseInt(a.fechaUyt.split(' ')[0]);
+                const mesA = mesesCompletos[a.fechaUyt.split(' ')[1]];
+                const [hA, mA] = a.horaUyt.split(':').map(Number);
+
+                const diaB = parseInt(b.fechaUyt.split(' ')[0]);
+                const mesB = mesesCompletos[b.fechaUyt.split(' ')[1]];
+                const [hB, mB] = b.horaUyt.split(':').map(Number);
+
+                const valA = mesA * 1000000 + diaA * 10000 + hA * 100 + mA;
+                const valB = mesB * 1000000 + diaB * 10000 + hB * 100 + mB;
+
+                return valA - valB;
+            });
+
+            let ultimaFecha = '';
+
+            fixtureOrdenado.forEach(p => {
+                let eq1 = equipos.find(e => e.id === p.t1);
+                let eq2 = equipos.find(e => e.id === p.t2);
+                let n1 = eq1 ? eq1.nombre : p.t1;
+                let n2 = eq2 ? eq2.nombre : p.t2;
+
+                if (filtroEquipo && !n1.toLowerCase().includes(filtroEquipo) && !n2.toLowerCase().includes(filtroEquipo)) {
+                    return;
+                }
+
                 let v1 = p.g1 !== null ? p.g1 : '';
                 let v2 = p.g2 !== null ? p.g2 : '';
 
-                cont.innerHTML += `
-                    <div class="bg-gray-50 p-2 rounded border border-gray-200 flex justify-between items-center shadow-sm">
-                        <div class="text-right flex-1 text-sm font-medium mr-2 truncate">${n1} <span class="text-[10px] text-gray-400">(${p.grp})</span></div>
-                        <div class="flex gap-1 items-center font-bold">
-                            <input type="number" min="0" max="20" value="${v1}" oninput="actualizarGol(${p.id}, 1, this.value)" class="w-10 h-8 text-center border border-gray-300 rounded focus:border-blue-500 outline-none text-lg">
-                            <span class="text-gray-400">-</span>
-                            <input type="number" min="0" max="20" value="${v2}" oninput="actualizarGol(${p.id}, 2, this.value)" class="w-10 h-8 text-center border border-gray-300 rounded focus:border-blue-500 outline-none text-lg">
+                const bEstiloReal = p.esReal
+                    ? 'border-green-400 bg-green-50/50'
+                    : 'border-gray-200 bg-gray-50';
+
+                const btnEstiloReal = p.esReal
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300';
+
+                if (p.fechaUyt !== ultimaFecha && !filtroEquipo) {
+                    ultimaFecha = p.fechaUyt;
+                    cont.innerHTML += `
+                        <div class="text-xs font-bold text-gray-500 bg-gray-100/90 sticky top-[95px] py-1 px-2 rounded-md shadow-sm border border-gray-200/50 backdrop-blur-sm z-30 mt-4 mb-2 flex justify-between items-center">
+                            <span>📅 ${p.fechaUyt}</span>
+                            <span class="text-[9px] font-normal uppercase tracking-wider text-gray-400">Fase de Grupos</span>
                         </div>
-                        <div class="text-left flex-1 text-sm font-medium ml-2 truncate">${n2}</div>
+                    `;
+                }
+
+                cont.innerHTML += `
+                    <div data-id="${p.id}" data-fecha="${p.fechaUyt}" class="p-2 rounded border flex flex-col shadow-sm transition-all ${bEstiloReal}">
+                        <div class="flex justify-between items-center text-[10px] text-gray-500 mb-1.5 px-1 border-b pb-1 border-gray-100">
+                            <div>📅 ${p.fechaUyt} - ⏰ ${p.horaUyt} UYT</div>
+                            <div class="truncate max-w-[150px]">🏟️ ${p.estadio}</div>
+                            <button onclick="alternarTipoResultado(${p.id})" class="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider transition ${btnEstiloReal}">
+                                ${p.esReal ? '🔒 Real' : '🧪 Sim'}
+                            </button>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-right flex-1 text-xs font-semibold mr-2 truncate">
+                                ${n1} <span class="text-[9px] text-gray-400 font-normal">(${p.grp})</span>
+                            </div>
+                            <div class="flex gap-1 items-center font-bold">
+                                <input type="number" id="input-${p.id}-1" min="0" max="20" value="${v1}" oninput="actualizarGol(${p.id}, 1, this.value)" class="w-9 h-8 text-center border border-gray-300 rounded focus:border-blue-500 outline-none text-base bg-white">
+                                <span class="text-gray-400 font-normal text-sm">-</span>
+                                <input type="number" id="input-${p.id}-2" min="0" max="20" value="${v2}" oninput="actualizarGol(${p.id}, 2, this.value)" class="w-9 h-8 text-center border border-gray-300 rounded focus:border-blue-500 outline-none text-base bg-white">
+                            </div>
+                            <div class="text-left flex-1 text-xs font-semibold ml-2 truncate">
+                                ${n2}
+                            </div>
+                        </div>
                     </div>
                 `;
             });
+
+            if (cont.innerHTML === '') {
+                cont.innerHTML = `
+                    <div class="text-center py-8 text-gray-400 text-xs">
+                        No se encontraron partidos para "${filtroEquipo}".
+                    </div>
+                `;
+            }
+
+            // Restaurar el foco si correspondía a uno de nuestros inputs
+            if (focusedId && focusedId.startsWith('input-')) {
+                const el = document.getElementById(focusedId);
+                if (el) {
+                    el.focus();
+                }
+            }
         }
 
         function renderGrupos() {
@@ -202,16 +718,16 @@
             grupos.forEach(letra => {
                 let eqGrupo = estadoTorneo.filter(e => e.grupo === letra).sort((a, b) => a.posGrupo - b.posGrupo);
                 let tablaHTML = `
-                <div class="bg-white rounded shadow p-2 mb-3">
-                    <h3 class="font-bold text-blue-800 border-b pb-1 mb-1">Grupo ${letra}</h3>
-                    <table class="w-full text-sm text-left">
-                        <thead class="text-gray-500 text-[11px]"><tr><th>Eq</th><th class="text-center">PJ</th><th class="text-center">PTS</th><th class="text-center">DG</th></tr></thead>
+                <div class="bg-white rounded shadow p-2">
+                    <h3 class="font-bold text-blue-900 border-b pb-1 mb-1 text-sm">Grupo ${letra}</h3>
+                    <table class="w-full text-xs text-left">
+                        <thead class="text-gray-500 text-[10px]"><tr><th>Equipo</th><th class="text-center">PJ</th><th class="text-center">PTS</th><th class="text-center">DG</th></tr></thead>
                         <tbody>`;
-                
+
                 eqGrupo.forEach(eq => {
-                    let bColor = eq.posGrupo <= 2 ? 'border-green-500' : (eq.posGrupo === 3 ? 'border-orange-400' : 'border-red-500 text-gray-500');
+                    let bColor = eq.posGrupo <= 2 ? 'border-green-500' : (eq.posGrupo === 3 ? 'border-orange-400' : 'border-red-400 text-gray-400');
                     tablaHTML += `<tr class="border-t border-gray-100">
-                        <td class="p-1 border-l-2 ${bColor} font-medium pl-1">${eq.posGrupo}. ${eq.nombre}</td>
+                        <td class="p-1 border-l-2 ${bColor} font-medium pl-1.5">${eq.posGrupo}. ${eq.nombre}</td>
                         <td class="p-1 text-center">${eq.pj}</td>
                         <td class="p-1 text-center font-bold">${eq.pts}</td>
                         <td class="p-1 text-center">${eq.dg}</td>
@@ -224,14 +740,14 @@
         function renderTerceros() {
             const tbody = document.getElementById('tabla-terceros-body');
             tbody.innerHTML = '';
-            let terceros = estadoTorneo.filter(e => e.posGrupo === 3).sort((a, b) => b.pts - a.pts || b.dg - a.dg);
+            let terceros = estadoTorneo.filter(e => e.posGrupo === 3).sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
 
             terceros.forEach((eq, idx) => {
-                let clasifica = idx < 8; 
-                let rowClass = clasifica ? 'bg-orange-50 border-l-4 border-orange-400' : 'bg-red-50 border-l-4 border-red-500 text-gray-400';
+                let clasifica = idx < 8;
+                let rowClass = clasifica ? 'bg-orange-50/70 border-l-4 border-orange-400' : 'bg-red-50/50 border-l-4 border-red-400 text-gray-400';
                 tbody.innerHTML += `<tr class="${rowClass} border-b border-white">
                     <td class="p-1 pl-2 font-bold">${idx + 1}</td>
-                    <td class="p-1 font-medium">${eq.nombre} <span class="text-xs opacity-75">(${eq.grupo})</span></td>
+                    <td class="p-1 font-medium text-xs">${eq.nombre} <span class="text-[10px] opacity-75">(${eq.grupo})</span></td>
                     <td class="p-1 text-center font-bold">${eq.pts}</td>
                     <td class="p-1 text-center">${eq.dg}</td>
                 </tr>`;
@@ -241,11 +757,11 @@
         function renderGeneral() {
             const tbody = document.getElementById('tabla-general-body');
             tbody.innerHTML = '';
-            let ordenados = [...estadoTorneo].sort((a, b) => b.pts - a.pts || b.dg - a.dg);
+            let ordenados = [...estadoTorneo].sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
             ordenados.forEach((eq, idx) => {
-                tbody.innerHTML += `<tr class="hover:bg-gray-50 border-b border-gray-100">
+                tbody.innerHTML += `<tr class="hover:bg-gray-50 border-b border-gray-100 text-xs">
                     <td class="p-1 text-gray-500">${idx + 1}</td>
-                    <td class="p-1 font-medium">${eq.nombre} <span class="text-[10px] text-gray-400">(${eq.grupo})</span></td>
+                    <td class="p-1 font-medium">${eq.nombre} <span class="text-[9px] text-gray-400">(${eq.grupo})</span></td>
                     <td class="p-1 text-center font-bold">${eq.pts}</td><td class="p-1 text-center">${eq.dg}</td>
                 </tr>`;
             });
@@ -254,33 +770,144 @@
         function renderCruces() {
             const cont = document.getElementById('contenedor-cruces');
             cont.innerHTML = '';
-            
-            // Lógica simplificada de cruces
-            const getEq = (pos, grp) => estadoTorneo.find(e => e.posGrupo === pos && e.grupo === grp) || {nombre: 'Por definir'};
-            let terceros = estadoTorneo.filter(e => e.posGrupo === 3).sort((a, b) => b.pts - a.pts || b.dg - a.dg);
-            const get3ro = (idx) => terceros[idx] || {nombre: 'Por definir'};
 
-            // Estructura de cruces teóricos (16avos)
+            const getEq = (pos, grp) => estadoTorneo.find(e => e.posGrupo === pos && e.grupo === grp) || { nombre: `Por definir (${pos}${grp})` };
+            let terceros = estadoTorneo.filter(e => e.posGrupo === 3).sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
+            const get3ro = (idx) => terceros[idx] || { nombre: `Mejor 3º (${idx + 1})` };
+
+            // Estructura oficial del bracket de los 16avos de final (FIFA World Cup 2026)
             const llaves = [
-                { t1: getEq(1, 'A'), t2: get3ro(0), desc: '1A vs 1º Mejor Tercero' },
-                { t1: getEq(2, 'B'), t2: getEq(2, 'C'), desc: '2B vs 2C' },
-                { t1: getEq(1, 'C'), t2: get3ro(1), desc: '1C vs 2º Mejor Tercero' },
-                { t1: getEq(1, 'D'), t2: get3ro(2), desc: '1D vs 3º Mejor Tercero' }
-                // Agregás el resto a medida que sumás grupos
+                { t1: getEq(2, 'A'), t1Label: '2º A', t2: getEq(2, 'B'), t2Label: '2º B', desc: 'Match 73 (Llave 1)' },
+                { t1: getEq(1, 'E'), t1Label: '1º E', t2: get3ro(0), t2Label: '3º', desc: 'Match 74 (Llave 2)' },
+                { t1: getEq(1, 'F'), t1Label: '1º F', t2: getEq(2, 'C'), t2Label: '2º C', desc: 'Match 75 (Llave 3)' },
+                { t1: getEq(1, 'C'), t1Label: '1º C', t2: getEq(2, 'F'), t2Label: '2º F', desc: 'Match 76 (Llave 4)' },
+                { t1: getEq(1, 'I'), t1Label: '1º I', t2: get3ro(1), t2Label: '3º', desc: 'Match 77 (Llave 5)' },
+                { t1: getEq(2, 'E'), t1Label: '2º E', t2: getEq(2, 'I'), t2Label: '2º I', desc: 'Match 78 (Llave 6)' },
+                { t1: getEq(1, 'A'), t1Label: '1º A', t2: get3ro(2), t2Label: '3º', desc: 'Match 79 (Llave 7)' },
+                { t1: getEq(1, 'L'), t1Label: '1º L', t2: get3ro(3), t2Label: '3º', desc: 'Match 80 (Llave 8)' },
+                { t1: getEq(1, 'D'), t1Label: '1º D', t2: get3ro(4), t2Label: '3º', desc: 'Match 81 (Llave 9)' },
+                { t1: getEq(1, 'G'), t1Label: '1º G', t2: get3ro(5), t2Label: '3º', desc: 'Match 82 (Llave 10)' },
+                { t1: getEq(2, 'K'), t1Label: '2º K', t2: getEq(2, 'L'), t2Label: '2º L', desc: 'Match 83 (Llave 11)' },
+                { t1: getEq(1, 'H'), t1Label: '1º H', t2: getEq(2, 'J'), t2Label: '2º J', desc: 'Match 84 (Llave 12)' },
+                { t1: getEq(1, 'B'), t1Label: '1º B', t2: get3ro(6), t2Label: '3º', desc: 'Match 85 (Llave 13)' },
+                { t1: getEq(1, 'J'), t1Label: '1º J', t2: getEq(2, 'H'), t2Label: '2º H', desc: 'Match 86 (Llave 14)' },
+                { t1: getEq(1, 'K'), t1Label: '1º K', t2: get3ro(7), t2Label: '3º', desc: 'Match 87 (Llave 15)' },
+                { t1: getEq(2, 'D'), t1Label: '2º D', t2: getEq(2, 'G'), t2Label: '2º G', desc: 'Match 88 (Llave 16)' }
             ];
 
-            llaves.forEach((llave, idx) => {
-                cont.innerHTML += `
-                    <div class="bg-blue-50 border border-blue-200 rounded p-2 mb-2">
-                        <div class="text-[10px] text-blue-500 font-bold uppercase mb-1">Partido ${idx + 1} - ${llave.desc}</div>
-                        <div class="flex justify-between items-center text-sm font-medium">
-                            <div class="flex-1 ${llave.t1.id ? 'text-gray-800' : 'text-gray-400 italic'}">${llave.t1.nombre}</div>
-                            <div class="px-2 text-gray-400 font-bold">vs</div>
-                            <div class="flex-1 text-right ${llave.t2.id ? 'text-gray-800' : 'text-gray-400 italic'}">${llave.t2.nombre}</div>
+            // Limpieza preventiva si cambiaron posiciones de fase de grupos
+            for (let idx = 0; idx < llaves.length; idx++) {
+                const llave = llaves[idx];
+                const ganadorSelected = ganadores16avos[idx];
+                if (ganadorSelected && ganadorSelected !== llave.t1.id && ganadorSelected !== llave.t2.id) {
+                    delete ganadores16avos[idx];
+                }
+            }
+
+            // Del mismo modo, limpiar ganadores de octavos si el ganador de 16avos cambió
+            const getWinner16avo = (llaveNum) => {
+                const winnerId = ganadores16avos[llaveNum];
+                if (!winnerId) return null;
+                return estadoTorneo.find(e => e.id === winnerId) || { id: winnerId, nombre: winnerId };
+            };
+
+            const octavos = [
+                { t1: getWinner16avo(1) || { nombre: 'Ganador Llave 2 (Match 74)' }, t2: getWinner16avo(4) || { nombre: 'Ganador Llave 5 (Match 77)' }, desc: 'Match 89 (8vo 1)' },
+                { t1: getWinner16avo(0) || { nombre: 'Ganador Llave 1 (Match 73)' }, t2: getWinner16avo(2) || { nombre: 'Ganador Llave 3 (Match 75)' }, desc: 'Match 90 (8vo 2)' },
+                { t1: getWinner16avo(3) || { nombre: 'Ganador Llave 4 (Match 76)' }, t2: getWinner16avo(5) || { nombre: 'Ganador Llave 6 (Match 78)' }, desc: 'Match 91 (8vo 3)' },
+                { t1: getWinner16avo(6) || { nombre: 'Ganador Llave 7 (Match 79)' }, t2: getWinner16avo(7) || { fontItalic: true, nombre: 'Ganador Llave 8 (Match 80)' }, desc: 'Match 92 (8vo 4)' },
+                { t1: getWinner16avo(10) || { nombre: 'Ganador Llave 11 (Match 83)' }, t2: getWinner16avo(11) || { nombre: 'Ganador Llave 12 (Match 84)' }, desc: 'Match 93 (8vo 5)' },
+                { t1: getWinner16avo(8) || { nombre: 'Ganador Llave 9 (Match 81)' }, t2: getWinner16avo(9) || { nombre: 'Ganador Llave 10 (Match 82)' }, desc: 'Match 94 (8vo 6)' },
+                { t1: getWinner16avo(13) || { nombre: 'Ganador Llave 14 (Match 86)' }, t2: getWinner16avo(15) || { nombre: 'Ganador Llave 16 (Match 88)' }, desc: 'Match 95 (8vo 7)' },
+                { t1: getWinner16avo(12) || { nombre: 'Ganador Llave 13 (Match 85)' }, t2: getWinner16avo(14) || { nombre: 'Ganador Llave 15 (Match 87)' }, desc: 'Match 96 (8vo 8)' }
+            ];
+
+            for (let idx = 0; idx < octavos.length; idx++) {
+                const o = octavos[idx];
+                const ganadorSelected = ganadores8vos[idx];
+                if (ganadorSelected && (!o.t1.id || ganadorSelected !== o.t1.id) && (!o.t2.id || ganadorSelected !== o.t2.id)) {
+                    delete ganadores8vos[idx];
+                }
+            }
+
+            if (subTabActivo === '16avos') {
+                llaves.forEach((llave, idx) => {
+                    const styleT1 = llave.t1.id ? 'text-gray-800 font-bold hover:bg-blue-100/70 cursor-pointer' : 'text-gray-400 italic';
+                    const styleT2 = llave.t2.id ? 'text-gray-800 font-bold hover:bg-blue-100/70 cursor-pointer' : 'text-gray-400 italic';
+                    
+                    const ganadorSelected = ganadores16avos[idx];
+                    const borderClass = ganadorSelected ? 'border-green-300 bg-green-50/20' : 'border-gray-200 bg-gray-50/40';
+                    
+                    const winStyleT1 = ganadorSelected === llave.t1.id ? 'bg-green-600 text-white rounded px-1.5 py-0.5' : '';
+                    const winStyleT2 = ganadorSelected === llave.t2.id ? 'bg-green-600 text-white rounded px-1.5 py-0.5' : '';
+                    
+                    const actionT1 = llave.t1.id ? `onclick="elegirGanador16avo(${idx}, '${llave.t1.id}')"` : '';
+                    const actionT2 = llave.t2.id ? `onclick="elegirGanador16avo(${idx}, '${llave.t2.id}')"` : '';
+
+                    let badgeT1 = '';
+                    if (llave.t1.id) {
+                        let text = llave.t1Label;
+                        if (text === '3º' && llave.t1.grupo) text = `3º ${llave.t1.grupo}`;
+                        badgeT1 = `<span class="bg-blue-100/60 text-blue-800 text-[9px] px-1 py-0.5 rounded font-medium select-none ml-1">${text}</span>`;
+                    }
+                    let badgeT2 = '';
+                    if (llave.t2.id) {
+                        let text = llave.t2Label;
+                        if (text === '3º' && llave.t2.grupo) text = `3º ${llave.t2.grupo}`;
+                        badgeT2 = `<span class="bg-blue-100/60 text-blue-800 text-[9px] px-1 py-0.5 rounded font-medium select-none mr-1">${text}</span>`;
+                    }
+
+                    cont.innerHTML += `
+                        <div class="border rounded-lg p-2.5 mb-1.5 shadow-sm transition-all duration-200 ${borderClass}">
+                            <div class="flex justify-between items-center text-[9px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+                                <span>${llave.desc}</span>
+                                ${ganadorSelected ? '<span class="text-green-600 font-extrabold flex items-center gap-0.5">✓ Clasificado</span>' : (llave.t1.id && llave.t2.id ? '<span class="text-blue-500 font-semibold opacity-75">Toca un equipo para clasificarlo</span>' : '<span class="text-gray-400 font-semibold opacity-75">Esperando definición de grupos</span>')}
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <div ${actionT1} class="flex-1 p-1.5 rounded transition-all duration-150 ${styleT1} flex items-center justify-start gap-1">
+                                    <span class="${winStyleT1}">${llave.t1.nombre}</span> ${badgeT1}
+                                </div>
+                                <div class="px-3 text-gray-400 font-bold text-[10px] select-none">VS</div>
+                                <div ${actionT2} class="flex-1 p-1.5 rounded transition-all duration-150 text-right ${styleT2} flex items-center justify-end gap-1">
+                                    ${badgeT2} <span class="${winStyleT2}">${llave.t2.nombre}</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            } else {
+                octavos.forEach((llave, idx) => {
+                    const styleT1 = llave.t1.id ? 'text-gray-800 font-bold hover:bg-blue-100/70 cursor-pointer' : 'text-gray-400 italic';
+                    const styleT2 = llave.t2.id ? 'text-gray-800 font-bold hover:bg-blue-100/70 cursor-pointer' : 'text-gray-400 italic';
+                    
+                    const ganadorSelected = ganadores8vos[idx];
+                    const borderClass = ganadorSelected ? 'border-green-300 bg-green-50/20' : 'border-gray-200 bg-gray-50/40';
+                    
+                    const winStyleT1 = ganadorSelected === llave.t1.id ? 'bg-green-600 text-white rounded px-1.5 py-0.5' : '';
+                    const winStyleT2 = ganadorSelected === llave.t2.id ? 'bg-green-600 text-white rounded px-1.5 py-0.5' : '';
+                    
+                    const actionT1 = llave.t1.id ? `onclick="elegirGanador8vo(${idx}, '${llave.t1.id}')"` : '';
+                    const actionT2 = llave.t2.id ? `onclick="elegirGanador8vo(${idx}, '${llave.t2.id}')"` : '';
+
+                    cont.innerHTML += `
+                        <div class="border rounded-lg p-2.5 mb-1.5 shadow-sm transition-all duration-200 ${borderClass}">
+                            <div class="flex justify-between items-center text-[9px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+                                <span>${llave.desc}</span>
+                                ${ganadorSelected ? '<span class="text-green-600 font-extrabold flex items-center gap-0.5">✓ Ganador</span>' : (llave.t1.id && llave.t2.id ? '<span class="text-blue-500 font-semibold opacity-75">Toca un equipo para clasificarlo</span>' : '<span class="text-gray-400 font-semibold opacity-75">Esperando clasificados de 16avos</span>')}
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <div ${actionT1} class="flex-1 p-1.5 rounded transition-all duration-150 ${styleT1} flex items-center justify-start gap-1">
+                                    <span class="${winStyleT1}">${llave.t1.nombre}</span>
+                                </div>
+                                <div class="px-3 text-gray-400 font-bold text-[10px] select-none">VS</div>
+                                <div ${actionT2} class="flex-1 p-1.5 rounded transition-all duration-150 text-right ${styleT2} flex items-center justify-end gap-1">
+                                    <span class="${winStyleT2}">${llave.t2.nombre}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
         }
 
         // --- NAVEGACIÓN TABS ---
@@ -296,9 +923,123 @@
             btn.classList.remove('text-gray-500');
         }
 
-        // Inicializar
-        window.onload = calcularPosiciones;
+        function showToast(message, type = 'info') {
+            const existingToast = document.getElementById('toast-notification');
+            if (existingToast) {
+                existingToast.remove();
+            }
 
+            const toast = document.createElement('div');
+            toast.id = 'toast-notification';
+            toast.className = `fixed bottom-20 left-1/2 transform -translate-x-1/2 px-4 py-2.5 rounded-lg text-xs font-semibold shadow-lg z-50 flex items-center gap-2 border transition-all duration-300 ${type === 'success'
+                    ? 'bg-green-50 border-green-200 text-green-800'
+                    : type === 'warning'
+                        ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                        : 'bg-blue-50 border-blue-200 text-blue-800'
+                }`;
+
+            let icon = '';
+            if (type === 'success') {
+                icon = `<svg class="w-4 h-4 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            } else if (type === 'warning') {
+                icon = `<svg class="w-4 h-4 text-yellow-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+            } else {
+                icon = `<svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            }
+
+            toast.innerHTML = `${icon} <span>${message}</span>`;
+            document.body.appendChild(toast);
+
+            toast.style.opacity = '0';
+            toast.style.transform = 'translate(-50%, 10px)';
+            toast.offsetHeight; // force reflow
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, 0)';
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function irAPartidosDeHoy() {
+            cambiarTab('fixture');
+
+            const mesesCompletos = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+            const hoyObj = new Date();
+            const dia = hoyObj.getDate();
+            const mes = mesesCompletos[hoyObj.getMonth()];
+            const hoyString = `${dia} ${mes}`;
+
+            const elementos = document.querySelectorAll('[data-fecha]');
+            let targetElement = null;
+
+            // 1. Intentar buscar el primer partido de hoy
+            for (let el of elementos) {
+                if (el.getAttribute('data-fecha') === hoyString) {
+                    targetElement = el;
+                    break;
+                }
+            }
+
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showToast(`Posicionado en los partidos de hoy (${hoyString})`, 'success');
+
+                // Resaltar los partidos de hoy
+                const partidosHoy = document.querySelectorAll(`[data-fecha="${hoyString}"]`);
+                partidosHoy.forEach(el => {
+                    el.classList.add('ring-2', 'ring-blue-500', 'scale-[1.01]');
+                    setTimeout(() => {
+                        el.classList.remove('ring-2', 'ring-blue-500', 'scale-[1.01]');
+                    }, 2500);
+                });
+            } else {
+                // Fallback: buscar el primer partido pendiente sin goles definidos
+                const primerPendiente = fixture.find(p => p.g1 === null && p.g2 === null);
+                if (primerPendiente) {
+                    targetElement = document.querySelector(`[data-id="${primerPendiente.id}"]`);
+                }
+
+                // Segundo fallback: primer partido
+                if (!targetElement && elementos.length > 0) {
+                    targetElement = elementos[0];
+                }
+
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const fechaElemento = targetElement.getAttribute('data-fecha');
+                    showToast(`No hay partidos hoy (${hoyString}). Mostrando partidos del ${fechaElemento}.`, 'info');
+
+                    const partidosFecha = document.querySelectorAll(`[data-fecha="${fechaElemento}"]`);
+                    partidosFecha.forEach(el => {
+                        el.classList.add('ring-2', 'ring-blue-500', 'scale-[1.01]');
+                        setTimeout(() => {
+                            el.classList.remove('ring-2', 'ring-blue-500', 'scale-[1.01]');
+                        }, 2500);
+                    });
+                } else {
+                    showToast(`No se encontraron partidos.`, 'warning');
+                }
+            }
+        }
+
+        window.onload = inicializarDatos;
     </script>
+
+    <!-- Botón flotante para hoy -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <button onclick="irAPartidosDeHoy()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-1.5 font-semibold text-xs border border-blue-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Partidos de Hoy
+        </button>
+    </div>
 </body>
+
 </html>
