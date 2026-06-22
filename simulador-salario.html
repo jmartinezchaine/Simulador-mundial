@@ -147,42 +147,47 @@
         <!-- Equiparación Inversa (Negociación con el Banco) -->
         <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-600 mt-6">
             <h2 class="text-2xl font-bold mb-2 text-purple-950">Negociación con el Banco (Equiparación Inversa)</h2>
-            <p class="mb-4 text-sm text-gray-600">Tomando como base la oferta anual de <strong>Itti</strong> (<span id="eq_inv_base_anual" class="font-bold text-blue-700"></span>), calcula cuánto deberías solicitar de salario bruto mensual en el banco para igualarla y bajo 3 escenarios de incremento sobre la base de Itti.</p>
+            <p class="mb-4 text-sm text-gray-600">Tomando como base el salario líquido mensual de <strong>Itti</strong> (<span id="eq_inv_base_mensual" class="font-bold text-blue-700"></span>), calcula cuánto deberías solicitar de salario bruto mensual en el banco para igualarlo y bajo 3 escenarios de incremento sobre la base de Itti.</p>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left border-collapse">
                     <thead>
                         <tr class="bg-purple-50 text-purple-900 border-b border-purple-200">
                             <th class="p-3 font-semibold">Escenario / Aumento</th>
-                            <th class="p-3 font-semibold">Valor Neto Anual Requerido</th>
-                            <th class="p-3 font-semibold">Bruto Mensual a Pedir (Nominal)</th>
-                            <th class="p-3 font-semibold">Líquido Mensual Resultante</th>
+                            <th class="p-3 font-semibold text-center">Mensual Bruto (Nominal)</th>
+                            <th class="p-3 font-semibold text-center">Mensual Líquido</th>
+                            <th class="p-3 font-semibold text-center">Anual Bruto (Nominal)</th>
+                            <th class="p-3 font-semibold text-center">Anual Líquido</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-purple-100">
                         <tr class="hover:bg-purple-50/50">
                             <td class="p-3 font-medium text-gray-800">0% (Igualar Itti Base)</td>
-                            <td class="p-3 font-semibold text-gray-700" id="eq_inv_anual_0"></td>
-                            <td class="p-3 font-bold text-purple-700" id="eq_inv_bruto_0"></td>
-                            <td class="p-3 text-gray-700" id="eq_inv_liq_0"></td>
+                            <td class="p-3 text-center font-bold text-purple-700" id="eq_inv_bruto_0"></td>
+                            <td class="p-3 text-center font-semibold text-green-700" id="eq_inv_liq_0"></td>
+                            <td class="p-3 text-center text-gray-600" id="eq_inv_anual_bruto_0"></td>
+                            <td class="p-3 text-center text-gray-800 font-bold" id="eq_inv_anual_liq_0"></td>
                         </tr>
                         <tr class="hover:bg-purple-50/50">
                             <td class="p-3 font-medium text-gray-800">10% de Incremento</td>
-                            <td class="p-3 font-semibold text-gray-700" id="eq_inv_anual_10"></td>
-                            <td class="p-3 font-bold text-purple-700" id="eq_inv_bruto_10"></td>
-                            <td class="p-3 text-gray-700" id="eq_inv_liq_10"></td>
+                            <td class="p-3 text-center font-bold text-purple-700" id="eq_inv_bruto_10"></td>
+                            <td class="p-3 text-center font-semibold text-green-700" id="eq_inv_liq_10"></td>
+                            <td class="p-3 text-center text-gray-600" id="eq_inv_anual_bruto_10"></td>
+                            <td class="p-3 text-center text-gray-800 font-bold" id="eq_inv_anual_liq_10"></td>
                         </tr>
                         <tr class="hover:bg-purple-50/50">
                             <td class="p-3 font-medium text-gray-800">20% de Incremento</td>
-                            <td class="p-3 font-semibold text-gray-700" id="eq_inv_anual_20"></td>
-                            <td class="p-3 font-bold text-purple-700" id="eq_inv_bruto_20"></td>
-                            <td class="p-3 text-gray-700" id="eq_inv_liq_20"></td>
+                            <td class="p-3 text-center font-bold text-purple-700" id="eq_inv_bruto_20"></td>
+                            <td class="p-3 text-center font-semibold text-green-700" id="eq_inv_liq_20"></td>
+                            <td class="p-3 text-center text-gray-600" id="eq_inv_anual_bruto_20"></td>
+                            <td class="p-3 text-center text-gray-800 font-bold" id="eq_inv_anual_liq_20"></td>
                         </tr>
                         <tr class="hover:bg-purple-50/50">
                             <td class="p-3 font-medium text-gray-800">30% de Incremento</td>
-                            <td class="p-3 font-semibold text-gray-700" id="eq_inv_anual_30"></td>
-                            <td class="p-3 font-bold text-purple-700" id="eq_inv_bruto_30"></td>
-                            <td class="p-3 text-gray-700" id="eq_inv_liq_30"></td>
+                            <td class="p-3 text-center font-bold text-purple-700" id="eq_inv_bruto_30"></td>
+                            <td class="p-3 text-center font-semibold text-green-700" id="eq_inv_liq_30"></td>
+                            <td class="p-3 text-center text-gray-600" id="eq_inv_anual_bruto_30"></td>
+                            <td class="p-3 text-center text-gray-800 font-bold" id="eq_inv_anual_liq_30"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -385,26 +390,51 @@
             document.getElementById('eq_porcentaje').innerText = aumentoPct.toFixed(1);
 
             // --- Equiparación Inversa (Negociación con el Banco) ---
-            document.getElementById('eq_inv_base_anual').innerText = formatUYU(ittiAnual);
+            document.getElementById('eq_inv_base_mensual').innerText = formatUYU(ittiLiqMensual);
             
             const increments = [0, 10, 20, 30];
             increments.forEach(pct => {
-                const targetAnual = ittiAnual * (1 + pct / 100);
-                const targetLiq = (targetAnual - (bbvaExtra * 12)) / bbvaSueldos;
-                const targetGross = getGrossFromNet(targetLiq, bpc, cjpbRate, aebuChecked);
-                const targetGrossUsd = tc > 0 ? (targetGross / tc) : 0;
+                const targetLiqMensual = ittiLiqMensual * (1 + pct / 100);
+                const targetGrossMensual = getGrossFromNet(targetLiqMensual, bpc, cjpbRate, aebuChecked);
                 
-                document.getElementById(`eq_inv_anual_${pct}`).innerText = formatUYU(targetAnual);
+                const targetGrossAnual = (targetGrossMensual * bbvaSueldos) + (bbvaExtra * 12);
+                const targetLiqAnual = (targetLiqMensual * bbvaSueldos) + (bbvaExtra * 12);
+                
+                const targetGrossMensualUsd = tc > 0 ? (targetGrossMensual / tc) : 0;
+                const targetLiqMensualUsd = tc > 0 ? (targetLiqMensual / tc) : 0;
+                
+                const targetGrossAnualUsd = tc > 0 ? (targetGrossAnual / tc) : 0;
+                const targetLiqAnualUsd = tc > 0 ? (targetLiqAnual / tc) : 0;
+                
+                // Mensual Bruto (Nominal)
                 document.getElementById(`eq_inv_bruto_${pct}`).innerHTML = `
-                    <div class="flex flex-col">
-                        <span class="font-bold text-purple-700">${formatUSD(targetGrossUsd)}</span>
-                        <span class="text-[11px] text-gray-500 font-normal">(${formatUYU(targetGross)})</span>
+                    <div class="flex flex-col text-center">
+                        <span class="font-bold text-purple-700">${formatUSD(targetGrossMensualUsd)}</span>
+                        <span class="text-[11px] text-gray-500 font-normal">(${formatUYU(targetGrossMensual)})</span>
                     </div>
                 `;
+                
+                // Mensual Líquido
                 document.getElementById(`eq_inv_liq_${pct}`).innerHTML = `
-                    <div class="flex flex-col">
-                        <span>${formatUSD(tc > 0 ? targetLiq / tc : 0)}</span>
-                        <span class="text-[11px] text-gray-500 font-normal">(${formatUYU(targetLiq)})</span>
+                    <div class="flex flex-col text-center">
+                        <span class="font-bold text-green-700">${formatUSD(targetLiqMensualUsd)}</span>
+                        <span class="text-[11px] text-gray-500 font-normal">(${formatUYU(targetLiqMensual)})</span>
+                    </div>
+                `;
+                
+                // Anual Bruto (Nominal)
+                document.getElementById(`eq_inv_anual_bruto_${pct}`).innerHTML = `
+                    <div class="flex flex-col text-center">
+                        <span class="font-semibold text-gray-700">${formatUSD(targetGrossAnualUsd)}</span>
+                        <span class="text-[11px] text-gray-400 font-normal">(${formatUYU(targetGrossAnual)})</span>
+                    </div>
+                `;
+                
+                // Anual Líquido
+                document.getElementById(`eq_inv_anual_liq_${pct}`).innerHTML = `
+                    <div class="flex flex-col text-center">
+                        <span class="font-bold text-gray-900">${formatUSD(targetLiqAnualUsd)}</span>
+                        <span class="text-[11px] text-gray-500 font-normal">(${formatUYU(targetLiqAnual)})</span>
                     </div>
                 `;
             });
