@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Ofertas Laborales (Uruguay)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-6 font-sans">
+
+    <div class="max-w-6xl mx-auto space-y-6">
+        <h1 class="text-3xl font-bold text-center text-blue-900">Análisis y Equiparación de Ofertas Laborales</h1>
+
+        <!-- Variables Globales -->
+        <div class="bg-white p-4 rounded-lg shadow-md flex flex-wrap gap-6 justify-center items-center border-b-4 border-gray-300">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700">Cotización del USD ($)</label>
+                <input type="number" id="tc" value="40" class="mt-1 block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-bold text-lg">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-700">Valor BPC actual ($)</label>
+                <input type="number" id="bpc" value="6177" class="mt-1 block w-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Columna ITTI -->
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <h2 class="text-xl font-bold mb-4 text-blue-600">Itti (Independiente)</h2>
+                <div class="space-y-4">
+                    
+                    <div class="bg-blue-50 p-3 rounded-md border border-blue-100">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Salario Mensual Base</label>
+                        <div class="flex gap-3">
+                            <div class="flex-1">
+                                <label class="block text-xs text-gray-500 mb-1">En USD</label>
+                                <input type="number" id="itti_usd" value="4700" class="w-full px-3 py-2 border rounded-md shadow-sm">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs text-gray-500 mb-1">En UYU</label>
+                                <input type="number" id="itti_uyu" value="188000" class="w-full px-3 py-2 border rounded-md shadow-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-700">Sueldos al Año</label>
+                        <input type="number" id="itti_sueldos" value="13" class="mt-1 w-full px-3 py-2 border rounded-md" step="0.1">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-700">Aportes Fijos Mensuales (UYU)</label>
+                        <input type="number" id="itti_aportes" value="9750" class="mt-1 w-full px-3 py-2 border rounded-md">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-700">Beneficios / Seguro Médico (UYU Mensual)</label>
+                        <input type="number" id="itti_extra" value="0" class="mt-1 w-full px-3 py-2 border rounded-md text-blue-700 font-semibold bg-blue-50">
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-blue-100 rounded-md">
+                    <p class="text-sm text-blue-800">Sueldo Líquido Mensual (UYU): <span id="itti_liq_mensual" class="font-bold text-lg"></span></p>
+                    <p class="text-xl font-black text-blue-900 mt-2">Valor Total Anual: <span id="itti_anual"></span> UYU</p>
+                    <p class="text-xs text-blue-600 mt-1">(Incluye beneficios multiplicados por 12 meses)</p>
+                </div>
+            </div>
+
+            <!-- Columna BBVA -->
+            <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
+                <h2 class="text-xl font-bold mb-4 text-green-600">BBVA (Dependiente Bancario)</h2>
+                <div class="space-y-4">
+                    
+                    <div class="bg-green-50 p-3 rounded-md border border-green-100">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Salario Mensual Base</label>
+                        <div class="flex gap-3">
+                            <div class="flex-1">
+                                <label class="block text-xs text-gray-500 mb-1">En USD</label>
+                                <input type="number" id="bbva_usd" value="7000" class="w-full px-3 py-2 border rounded-md shadow-sm">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs text-gray-500 mb-1">En UYU</label>
+                                <input type="number" id="bbva_uyu" value="280000" class="w-full px-3 py-2 border rounded-md shadow-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-700">Sueldos al Año</label>
+                        <input type="number" id="bbva_sueldos" value="13.7" class="mt-1 w-full px-3 py-2 border rounded-md" step="0.1">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-700">Tasa Caja Bancaria (%)</label>
+                        <select id="bbva_cjpb_rate" class="mt-1 w-full px-3 py-2 border rounded-md cursor-pointer bg-white">
+                            <option value="17.5" selected>17.5% (Tasa Histórica/Común)</option>
+                            <option value="15.0">15.0% (Tasa Estándar/Nueva)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-700">Beneficios / Seguro Médico (UYU Mensual)</label>
+                        <input type="number" id="bbva_extra" value="0" class="mt-1 w-full px-3 py-2 border rounded-md text-green-700 font-semibold bg-green-50">
+                    </div>
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="checkbox" id="bbva_aebu" class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer">
+                        <label for="bbva_aebu" class="text-sm font-semibold text-gray-700 cursor-pointer select-none">Descontar Cuota Sindical AEBU (1%)</label>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-sm space-y-1 text-gray-600 border-b pb-3">
+                    <p>Sueldo Bruto Mensual: <span id="bbva_bruto" class="font-semibold text-gray-800"></span></p>
+                    <p class="text-red-500">Caja Bancaria (<span id="bbva_jub_pct">17.5</span>% sin tope): -<span id="bbva_jub"></span></p>
+                    <p class="text-red-500">Fonasa (6%): -<span id="bbva_fonasa"></span></p>
+                    <p class="text-red-500">FRL (0.12%): -<span id="bbva_frl"></span></p>
+                    <p class="text-red-500" id="bbva_aebu_row" style="display:none;">Cuota AEBU (1%): -<span id="bbva_aebu_amount"></span></p>
+                    <p class="text-red-600 font-bold">IRPF Estimado: -<span id="bbva_irpf"></span></p>
+                </div>
+
+                <div class="mt-3 p-4 bg-green-100 rounded-md">
+                    <p class="text-sm text-green-800">Sueldo Líquido Mensual (UYU): <span id="bbva_liq_mensual" class="font-bold text-lg"></span></p>
+                    <p class="text-xl font-black text-green-900 mt-2">Valor Total Anual: <span id="bbva_anual"></span> UYU</p>
+                    <p class="text-xs text-green-700 mt-1">(Incluye beneficios multiplicados por 12 meses y Caja Bancaria)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultados de Equiparación -->
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md text-center mt-6 border-t-4 border-yellow-400">
+            <h2 class="text-2xl font-bold mb-2 text-yellow-400">Punto de Equiparación</h2>
+            <p class="mb-6 text-gray-300">¿A cuánto debe ajustar Itti el salario base para igualar el valor total anual de la otra propuesta?</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-700 p-5 rounded-lg border border-gray-600 shadow-inner">
+                    <p class="text-sm text-gray-400 mb-1">Nuevo Salario Base Sugerido (Itti)</p>
+                    <p class="text-3xl font-black text-white"><span id="eq_nuevo_usd"></span> USD</p>
+                    <p class="text-sm text-gray-400 mt-1">(<span id="eq_nuevo_uyu"></span> UYU)</p>
+                </div>
+                <div class="bg-gray-700 p-5 rounded-lg border border-gray-600 shadow-inner">
+                    <p class="text-sm text-gray-400 mb-1">Diferencia mensual a solicitar</p>
+                    <p class="text-3xl font-black text-blue-400">+ <span id="eq_dif_usd"></span> USD</p>
+                    <p class="text-sm text-gray-400 mt-1">(+ <span id="eq_dif_uyu"></span> UYU)</p>
+                </div>
+                <div class="bg-gray-700 p-5 rounded-lg border border-gray-600 shadow-inner flex flex-col justify-center">
+                    <p class="text-sm text-gray-400 mb-1">Aumento Porcentual Requerido</p>
+                    <p class="text-4xl font-black text-green-400"><span id="eq_porcentaje"></span>%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equiparación Inversa (Negociación con el Banco) -->
+        <div class="bg-white p-6 rounded-lg shadow-md border-t-4 border-purple-600 mt-6">
+            <h2 class="text-2xl font-bold mb-2 text-purple-950">Negociación con el Banco (Equiparación Inversa)</h2>
+            <p class="mb-4 text-sm text-gray-600">Tomando como base la oferta anual de <strong>Itti</strong> (<span id="eq_inv_base_anual" class="font-bold text-blue-700"></span>), calcula cuánto deberías solicitar de salario bruto mensual en el banco para igualarla y bajo 3 escenarios de incremento sobre la base de Itti.</p>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left border-collapse">
+                    <thead>
+                        <tr class="bg-purple-50 text-purple-900 border-b border-purple-200">
+                            <th class="p-3 font-semibold">Escenario / Aumento</th>
+                            <th class="p-3 font-semibold">Valor Neto Anual Requerido</th>
+                            <th class="p-3 font-semibold">Bruto Mensual a Pedir (Nominal)</th>
+                            <th class="p-3 font-semibold">Líquido Mensual Resultante</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-purple-100">
+                        <tr class="hover:bg-purple-50/50">
+                            <td class="p-3 font-medium text-gray-800">0% (Igualar Itti Base)</td>
+                            <td class="p-3 font-semibold text-gray-700" id="eq_inv_anual_0"></td>
+                            <td class="p-3 font-bold text-purple-700" id="eq_inv_bruto_0"></td>
+                            <td class="p-3 text-gray-700" id="eq_inv_liq_0"></td>
+                        </tr>
+                        <tr class="hover:bg-purple-50/50">
+                            <td class="p-3 font-medium text-gray-800">10% de Incremento</td>
+                            <td class="p-3 font-semibold text-gray-700" id="eq_inv_anual_10"></td>
+                            <td class="p-3 font-bold text-purple-700" id="eq_inv_bruto_10"></td>
+                            <td class="p-3 text-gray-700" id="eq_inv_liq_10"></td>
+                        </tr>
+                        <tr class="hover:bg-purple-50/50">
+                            <td class="p-3 font-medium text-gray-800">20% de Incremento</td>
+                            <td class="p-3 font-semibold text-gray-700" id="eq_inv_anual_20"></td>
+                            <td class="p-3 font-bold text-purple-700" id="eq_inv_bruto_20"></td>
+                            <td class="p-3 text-gray-700" id="eq_inv_liq_20"></td>
+                        </tr>
+                        <tr class="hover:bg-purple-50/50">
+                            <td class="p-3 font-medium text-gray-800">30% de Incremento</td>
+                            <td class="p-3 font-semibold text-gray-700" id="eq_inv_anual_30"></td>
+                            <td class="p-3 font-bold text-purple-700" id="eq_inv_bruto_30"></td>
+                            <td class="p-3 text-gray-700" id="eq_inv_liq_30"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-purple-600 mt-3 font-medium">* Los cálculos contemplan la tasa seleccionada de Caja Bancaria, el descuento AEBU (si está marcado), Fonasa, FRL y el IRPF correspondiente de forma 100% exacta sobre los sueldos anuales del banco.</p>
+        </div>
+    </div>
+
+    <script>
+        // Utilidades de formato
+        function formatUYU(num) { return "$ " + Math.round(num).toLocaleString("es-UY"); }
+        function formatUSD(num) { return "US$ " + Math.round(num).toLocaleString("es-UY"); }
+
+        // Elementos del DOM
+        const tcEl = document.getElementById('tc');
+        const bpcEl = document.getElementById('bpc');
+
+        const ittiUsdEl = document.getElementById('itti_usd');
+        const ittiUyuEl = document.getElementById('itti_uyu');
+        const ittiSueldosEl = document.getElementById('itti_sueldos');
+        const ittiAportesEl = document.getElementById('itti_aportes');
+        const ittiExtraEl = document.getElementById('itti_extra');
+
+        const bbvaUsdEl = document.getElementById('bbva_usd');
+        const bbvaUyuEl = document.getElementById('bbva_uyu');
+        const bbvaSueldosEl = document.getElementById('bbva_sueldos');
+        const bbvaExtraEl = document.getElementById('bbva_extra');
+
+        // Sincronización USD <-> UYU
+        function updateUyuFromUsd(usdEl, uyuEl) {
+            const tc = parseFloat(tcEl.value) || 0;
+            const usd = parseFloat(usdEl.value) || 0;
+            // Solo actualiza si el usuario está tipeando en el campo USD o TC
+            if(document.activeElement === usdEl || document.activeElement === tcEl) {
+                uyuEl.value = Math.round(usd * tc);
+            }
+        }
+
+        function updateUsdFromUyu(uyuEl, usdEl) {
+            const tc = parseFloat(tcEl.value) || 1; // Evitar división por 0
+            const uyu = parseFloat(uyuEl.value) || 0;
+            // Solo actualiza si el usuario está tipeando en el campo UYU
+            if(document.activeElement === uyuEl) {
+                usdEl.value = (uyu / tc).toFixed(2);
+            }
+        }
+
+        // Lógica de cálculo inverso: obtener Salario Bruto desde Salario Líquido para el banco
+        function getGrossFromNet(L, bpc, cjpbRate, hasAebu) {
+            const flatDeductionsRate = cjpbRate + 0.06 + 0.0012 + (hasAebu ? 0.01 : 0);
+            const deduccionRate = (cjpbRate + 0.06 + 0.0012) * 0.08;
+
+            const franjas = [
+                { limit: 7 * bpc, rate: 0 },
+                { limit: 10 * bpc, rate: 0.10 },
+                { limit: 15 * bpc, rate: 0.15 },
+                { limit: 30 * bpc, rate: 0.24 },
+                { limit: 50 * bpc, rate: 0.25 },
+                { limit: 75 * bpc, rate: 0.27 },
+                { limit: 115 * bpc, rate: 0.31 },
+                { limit: Infinity, rate: 0.36 }
+            ];
+
+            let previousLimit = 0;
+            let accumulatedNominalIRPF = 0;
+
+            for (let i = 0; i < franjas.length; i++) {
+                const franja = franjas[i];
+                const limitG = franja.limit;
+                
+                let limitIRPFNominal = accumulatedNominalIRPF;
+                if (limitG !== Infinity) {
+                    limitIRPFNominal += (limitG - previousLimit) * franja.rate;
+                }
+                
+                const limitDeducciones = limitG !== Infinity ? limitG * deduccionRate : 0;
+                const limitIRPFFinal = limitG !== Infinity ? Math.max(0, limitIRPFNominal - limitDeducciones) : Infinity;
+                const limitL = limitG !== Infinity ? limitG - (limitG * flatDeductionsRate) - limitIRPFFinal : Infinity;
+
+                if (L <= limitL) {
+                    const rate = franja.rate;
+                    const constant = accumulatedNominalIRPF - previousLimit * rate;
+                    const factor = 1 - flatDeductionsRate - rate + deduccionRate;
+                    return (L + constant) / factor;
+                }
+
+                if (limitG === Infinity) {
+                    break;
+                }
+
+                accumulatedNominalIRPF += (limitG - previousLimit) * franja.rate;
+                previousLimit = limitG;
+            }
+            return 0;
+        }
+
+        // Lógica Principal de Cálculo
+        function calculate() {
+            const tc = parseFloat(tcEl.value) || 0;
+            const bpc = parseFloat(bpcEl.value) || 0;
+
+            // Valores Base Itti
+            const ittiUsd = parseFloat(ittiUsdEl.value) || 0;
+            const ittiBrutoUyu = parseFloat(ittiUyuEl.value) || 0;
+            const ittiSueldos = parseFloat(ittiSueldosEl.value) || 0;
+            const ittiAportes = parseFloat(ittiAportesEl.value) || 0;
+            const ittiExtra = parseFloat(ittiExtraEl.value) || 0;
+
+            // Valores Base BBVA
+            const bbvaUsd = parseFloat(bbvaUsdEl.value) || 0;
+            const bbvaBrutoUyu = parseFloat(bbvaUyuEl.value) || 0;
+            const bbvaSueldos = parseFloat(bbvaSueldosEl.value) || 0;
+            const bbvaExtra = parseFloat(bbvaExtraEl.value) || 0;
+            const aebuChecked = document.getElementById('bbva_aebu').checked;
+            const aebuVal = aebuChecked ? bbvaBrutoUyu * 0.01 : 0;
+            const cjpbRate = parseFloat(document.getElementById('bbva_cjpb_rate').value) / 100 || 0.175;
+
+            // --- Cálculos Itti ---
+            const ittiLiqMensual = ittiBrutoUyu - ittiAportes;
+            const ittiAnual = (ittiLiqMensual * ittiSueldos) + (ittiExtra * 12);
+
+            // --- Cálculos BBVA ---
+            const jub = bbvaBrutoUyu * cjpbRate;
+            const fonasa = bbvaBrutoUyu * 0.06;
+            const frl = bbvaBrutoUyu * 0.0012;
+
+            // Franjas IRPF (mensual)
+            const franjas = [
+                { limit: 7 * bpc, rate: 0 },
+                { limit: 10 * bpc, rate: 0.10 },
+                { limit: 15 * bpc, rate: 0.15 },
+                { limit: 30 * bpc, rate: 0.24 },
+                { limit: 50 * bpc, rate: 0.25 },
+                { limit: 75 * bpc, rate: 0.27 },
+                { limit: 115 * bpc, rate: 0.31 },
+                { limit: Infinity, rate: 0.36 }
+            ];
+
+            let irpfNominal = 0;
+            let taxable = bbvaBrutoUyu;
+            let previousLimit = 0;
+
+            for (let franja of franjas) {
+                if (taxable > previousLimit) {
+                    let amountInBracket = Math.min(taxable, franja.limit) - previousLimit;
+                    irpfNominal += amountInBracket * franja.rate;
+                } else {
+                    break;
+                }
+                previousLimit = franja.limit;
+            }
+
+            // Deducciones IRPF (Asumimos 8% de los aportes jubilatorios/salud para sueldos que pagan franjas altas)
+            const deducciones = (jub + fonasa + frl) * 0.08;
+            const irpfFinal = Math.max(0, irpfNominal - deducciones);
+
+            const bbvaLiqMensual = bbvaBrutoUyu - jub - fonasa - frl - aebuVal - irpfFinal;
+            const bbvaAnual = (bbvaLiqMensual * bbvaSueldos) + (bbvaExtra * 12);
+
+            // --- Equiparación ---
+            // ¿Cuánto debe ser el bruto en Itti para igualar bbvaAnual?
+            const targetLiqMensualUyu = (bbvaAnual - (ittiExtra * 12)) / ittiSueldos;
+            const targetBrutoUyu = targetLiqMensualUyu + ittiAportes;
+            const targetUsd = tc > 0 ? (targetBrutoUyu / tc) : 0;
+            
+            const difUsd = targetUsd - ittiUsd;
+            const difUyu = targetBrutoUyu - ittiBrutoUyu;
+            const aumentoPct = ittiUsd > 0 ? ((difUsd / ittiUsd) * 100) : 0;
+
+            // --- Actualizar DOM Itti ---
+            document.getElementById('itti_liq_mensual').innerText = formatUYU(ittiLiqMensual);
+            document.getElementById('itti_anual').innerText = formatUYU(ittiAnual);
+
+            // --- Actualizar DOM BBVA ---
+            document.getElementById('bbva_bruto').innerText = formatUYU(bbvaBrutoUyu);
+            document.getElementById('bbva_jub_pct').innerText = (cjpbRate * 100).toFixed(1);
+            document.getElementById('bbva_jub').innerText = formatUYU(jub);
+            document.getElementById('bbva_fonasa').innerText = formatUYU(fonasa);
+            document.getElementById('bbva_frl').innerText = formatUYU(frl);
+            
+            const aebuRow = document.getElementById('bbva_aebu_row');
+            if (aebuChecked) {
+                aebuRow.style.display = 'block';
+                document.getElementById('bbva_aebu_amount').innerText = formatUYU(aebuVal);
+            } else {
+                aebuRow.style.display = 'none';
+            }
+
+            document.getElementById('bbva_irpf').innerText = formatUYU(irpfFinal);
+            document.getElementById('bbva_liq_mensual').innerText = formatUYU(bbvaLiqMensual);
+            document.getElementById('bbva_anual').innerText = formatUYU(bbvaAnual);
+
+            // --- Actualizar Equiparación ---
+            document.getElementById('eq_nuevo_usd').innerText = Math.round(targetUsd).toLocaleString("es-UY");
+            document.getElementById('eq_nuevo_uyu').innerText = formatUYU(targetBrutoUyu);
+            
+            document.getElementById('eq_dif_usd').innerText = Math.round(difUsd).toLocaleString("es-UY");
+            document.getElementById('eq_dif_uyu').innerText = formatUYU(difUyu);
+            
+            document.getElementById('eq_porcentaje').innerText = aumentoPct.toFixed(1);
+
+            // --- Equiparación Inversa (Negociación con el Banco) ---
+            document.getElementById('eq_inv_base_anual').innerText = formatUYU(ittiAnual);
+            
+            const increments = [0, 10, 20, 30];
+            increments.forEach(pct => {
+                const targetAnual = ittiAnual * (1 + pct / 100);
+                const targetLiq = (targetAnual - (bbvaExtra * 12)) / bbvaSueldos;
+                const targetGross = getGrossFromNet(targetLiq, bpc, cjpbRate, aebuChecked);
+                const targetGrossUsd = tc > 0 ? (targetGross / tc) : 0;
+                
+                document.getElementById(`eq_inv_anual_${pct}`).innerText = formatUYU(targetAnual);
+                document.getElementById(`eq_inv_bruto_${pct}`).innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="font-bold text-purple-700">${formatUSD(targetGrossUsd)}</span>
+                        <span class="text-[11px] text-gray-500 font-normal">(${formatUYU(targetGross)})</span>
+                    </div>
+                `;
+                document.getElementById(`eq_inv_liq_${pct}`).innerHTML = `
+                    <div class="flex flex-col">
+                        <span>${formatUSD(tc > 0 ? targetLiq / tc : 0)}</span>
+                        <span class="text-[11px] text-gray-500 font-normal">(${formatUYU(targetLiq)})</span>
+                    </div>
+                `;
+            });
+        }
+
+        // --- Event Listeners ---
+
+        // Listeners para sincronizar inputs USD/UYU de ITTI
+        ittiUsdEl.addEventListener('input', () => { updateUyuFromUsd(ittiUsdEl, ittiUyuEl); calculate(); });
+        ittiUyuEl.addEventListener('input', () => { updateUsdFromUyu(ittiUyuEl, ittiUsdEl); calculate(); });
+
+        // Listeners para sincronizar inputs USD/UYU de BBVA
+        bbvaUsdEl.addEventListener('input', () => { updateUyuFromUsd(bbvaUsdEl, bbvaUyuEl); calculate(); });
+        bbvaUyuEl.addEventListener('input', () => { updateUsdFromUyu(bbvaUyuEl, bbvaUsdEl); calculate(); });
+
+        // Listener para el Tipo de Cambio (recalcula UYU asumiendo que USD es la base)
+        tcEl.addEventListener('input', () => {
+            updateUyuFromUsd(ittiUsdEl, ittiUyuEl);
+            updateUyuFromUsd(bbvaUsdEl, bbvaUyuEl);
+            calculate();
+        });
+
+        // Listeners para el resto de los campos (solo recalcular)
+        [bpcEl, ittiSueldosEl, ittiAportesEl, ittiExtraEl, bbvaSueldosEl, bbvaExtraEl].forEach(el => {
+            el.addEventListener('input', calculate);
+        });
+        
+        document.getElementById('bbva_cjpb_rate').addEventListener('change', calculate);
+        document.getElementById('bbva_aebu').addEventListener('change', calculate);
+
+        // Ejecución inicial para llenar los datos
+        calculate();
+    </script>
+</body>
+</html>
